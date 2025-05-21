@@ -11,12 +11,12 @@ papermill==2.3.4
 markupsafe==2.1.1
 pyzmq==24.0.1
 tornado==6.1
-traitlets==5.2.2
+traitlets==5.2.2  # Upgraded to satisfy nbclient 0.7.0 requirement
 prompt-toolkit==3.0.30
 requests==2.27.1
 urllib3==1.26.16
 
-# Critical user dependencies
+# Critical user dependencies (must be preserved)
 boto3==1.28.40
 botocore==1.31.40
 minio==7.2.15

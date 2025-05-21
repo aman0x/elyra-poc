@@ -12,17 +12,17 @@ RUN apt-get update && apt-get install -y \
 # Copy requirements.txt file
 COPY requirements.txt /tmp/requirements.txt
 
-# Copy custom bootstrapper and patch scripts
-COPY custom_bootstrapper.py /opt/conda/bin/custom_bootstrapper.py
-COPY patch_dag.py /opt/conda/bin/patch_dag.py
+# Copy improved bootstrapper and robust DAG patcher scripts
+COPY bootstrapper.py /opt/conda/bin/bootstrapper.py
+COPY dag_patcher.py /opt/conda/bin/dag_patcher.py
 
 # Install all Python packages with pinned versions
 RUN pip install --no-cache-dir -r /tmp/requirements.txt && \
     # Create a backup of installed packages
     pip freeze > /opt/conda/requirements-current.txt && \
     # Make scripts executable
-    chmod +x /opt/conda/bin/custom_bootstrapper.py && \
-    chmod +x /opt/conda/bin/patch_dag.py
+    chmod +x /opt/conda/bin/bootstrapper.py && \
+    chmod +x /opt/conda/bin/dag_patcher.py
 
 # Make pip directories writable for all users
 RUN chmod -R 777 /opt/conda/lib/python3.11/site-packages && \
@@ -40,6 +40,12 @@ RUN mkdir -p /home/jovyan/jupyter-work-dir && \
 # Create additional directories that might be needed
 RUN mkdir -p /tmp/rom-pipeline-outputs && \
     chmod -R 777 /tmp/rom-pipeline-outputs
+
+# Create empty requirements files to prevent bootstrapper errors
+RUN touch /opt/conda/requirements-elyra.txt && \
+    touch /opt/conda/requirements-current.txt && \
+    chmod 666 /opt/conda/requirements-elyra.txt && \
+    chmod 666 /opt/conda/requirements-current.txt
 
 # Copy requirements.txt to a permanent location for reference
 COPY requirements.txt /opt/conda/requirements.txt
