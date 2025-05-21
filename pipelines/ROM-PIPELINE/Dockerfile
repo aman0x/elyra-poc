@@ -28,9 +28,10 @@ ipykernel==6.13.0\n\
 ipython==8.10.0\n\
 papermill==2.3.4\n\
 minio==7.1.8\n\
-# Install both lxml 4.9.3 and lxml_html_clean to ensure compatibility\n\
+# Use an older version of lxml that includes html.clean\n\
 lxml==4.9.3\n\
-lxml_html_clean\n\
+# Or install lxml_html_clean if using lxml 5.x\n\
+# lxml_html_clean\n\
 \n\
 # ROM pipeline required packages\n\
 boto3==1.28.40\n\
@@ -59,56 +60,25 @@ RUN pip install --no-cache-dir -r /tmp/requirements.txt && \
     # Create a backup of installed packages
     pip freeze > /opt/conda/requirements-current.txt
 
-# Create a patch for nbconvert to use lxml_html_clean if available
-RUN echo 'import sys\n\
-import os\n\
+# Create a script to force reinstall lxml 4.9.3 after bootstrapper runs
+RUN echo '#!/bin/bash\n\
 \n\
-# Create a patch file for nbconvert to handle lxml.html.clean import error\n\
-patch_file = "/opt/conda/lib/python3.11/site-packages/nbconvert_lxml_patch.py"\n\
-with open(patch_file, "w") as f:\n\
-    f.write("""\n\
-# Patch for nbconvert to handle lxml.html.clean import error\n\
-import sys\n\
-from importlib.util import find_spec\n\
+# Start the original command in the background\n\
+"$@" &\n\
 \n\
-# Check if original module exists\n\
-original_import = __import__\n\
+# Store the PID of the background process\n\
+CMD_PID=$!\n\
 \n\
-def patched_import(name, globals=None, locals=None, fromlist=(), level=0):\n\
-    try:\n\
-        return original_import(name, globals, locals, fromlist, level)\n\
-    except ImportError as e:\n\
-        # Only handle lxml.html.clean import error\n\
-        if name == "lxml.html.clean" or (name == "lxml.html" and "clean" in fromlist):\n\
-            # Check if lxml_html_clean is available\n\
-            if find_spec("lxml_html_clean"):\n\
-                if name == "lxml.html.clean":\n\
-                    return original_import("lxml_html_clean", globals, locals, fromlist, level)\n\
-                elif "clean" in fromlist:\n\
-                    # Import lxml_html_clean and add it to lxml.html\n\
-                    lxml_html = original_import("lxml.html", globals, locals, [], level)\n\
-                    lxml_html_clean = original_import("lxml_html_clean", globals, locals, fromlist, level)\n\
-                    setattr(lxml_html, "clean", lxml_html_clean)\n\
-                    return lxml_html\n\
-        # Re-raise the original exception\n\
-        raise e\n\
+# Wait for bootstrapper to finish installing packages\n\
+sleep 30\n\
 \n\
-# Replace the built-in __import__ function\n\
-sys.__import__ = patched_import\n\
-sys.modules["builtins"].__import__ = patched_import\n\
-""")\n\
+# Force reinstall lxml 4.9.3 to override any newer version\n\
+pip uninstall -y lxml && pip install lxml==4.9.3\n\
 \n\
-# Create a sitecustomize.py file to load the patch at Python startup\n\
-site_customize = "/opt/conda/lib/python3.11/site-packages/sitecustomize.py"\n\
-with open(site_customize, "w") as f:\n\
-    f.write("""\n\
-# Load nbconvert lxml patch\n\
-try:\n\
-    exec(open("/opt/conda/lib/python3.11/site-packages/nbconvert_lxml_patch.py").read())\n\
-except Exception as e:\n\
-    print(f"Error loading nbconvert lxml patch: {e}")\n\
-""")\n\
-' > /tmp/create_patch.py && python3 /tmp/create_patch.py
+# Wait for the original command to finish\n\
+wait $CMD_PID\n\
+' > /usr/local/bin/entrypoint.sh && \
+    chmod +x /usr/local/bin/entrypoint.sh
 
 # Make pip directories writable for all users
 RUN chmod -R 777 /opt/conda/lib/python3.11/site-packages && \
@@ -131,8 +101,22 @@ RUN mkdir -p /tmp/rom-pipeline-outputs && \
 RUN touch /opt/conda/requirements-elyra.txt && \
     chmod 666 /opt/conda/requirements-elyra.txt
 
+# Create a post-bootstrapper script to fix lxml
+RUN echo '#!/bin/bash\n\
+\n\
+# Force reinstall lxml 4.9.3 to override any newer version\n\
+pip uninstall -y lxml && pip install lxml==4.9.3\n\
+\n\
+# Continue with the original command\n\
+exec "$@"\n\
+' > /usr/local/bin/fix-lxml.sh && \
+    chmod +x /usr/local/bin/fix-lxml.sh
+
 # Switch back to non-root user for better security
 USER $NB_UID
 
 # Set working directory
 WORKDIR /home/$NB_USER/jupyter-work-dir
+
+# Set the entrypoint to our script
+ENTRYPOINT ["/usr/local/bin/fix-lxml.sh"]
