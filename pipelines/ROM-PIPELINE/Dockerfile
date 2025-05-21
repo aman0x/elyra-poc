@@ -60,6 +60,26 @@ RUN pip install --no-cache-dir -r /tmp/requirements.txt && \
     # Create a backup of installed packages
     pip freeze > /opt/conda/requirements-current.txt
 
+# Create a script to force reinstall lxml 4.9.3 after bootstrapper runs
+RUN echo '#!/bin/bash\n\
+\n\
+# Start the original command in the background\n\
+"$@" &\n\
+\n\
+# Store the PID of the background process\n\
+CMD_PID=$!\n\
+\n\
+# Wait for bootstrapper to finish installing packages\n\
+sleep 30\n\
+\n\
+# Force reinstall lxml 4.9.3 to override any newer version\n\
+pip uninstall -y lxml && pip install lxml==4.9.3\n\
+\n\
+# Wait for the original command to finish\n\
+wait $CMD_PID\n\
+' > /usr/local/bin/entrypoint.sh && \
+    chmod +x /usr/local/bin/entrypoint.sh
+
 # Make pip directories writable for all users
 RUN chmod -R 777 /opt/conda/lib/python3.11/site-packages && \
     chmod -R 777 /opt/conda/bin && \
@@ -81,8 +101,22 @@ RUN mkdir -p /tmp/rom-pipeline-outputs && \
 RUN touch /opt/conda/requirements-elyra.txt && \
     chmod 666 /opt/conda/requirements-elyra.txt
 
+# Create a post-bootstrapper script to fix lxml
+RUN echo '#!/bin/bash\n\
+\n\
+# Force reinstall lxml 4.9.3 to override any newer version\n\
+pip uninstall -y lxml && pip install lxml==4.9.3\n\
+\n\
+# Continue with the original command\n\
+exec "$@"\n\
+' > /usr/local/bin/fix-lxml.sh && \
+    chmod +x /usr/local/bin/fix-lxml.sh
+
 # Switch back to non-root user for better security
 USER $NB_UID
 
 # Set working directory
 WORKDIR /home/$NB_USER/jupyter-work-dir
+
+# Set the entrypoint to our script
+ENTRYPOINT ["/usr/local/bin/fix-lxml.sh"]
