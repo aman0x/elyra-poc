@@ -9,20 +9,44 @@ RUN apt-get update && apt-get install -y \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/*
 
-# Copy requirements.txt file
-COPY requirements.txt /tmp/requirements.txt
-
-# Copy improved bootstrapper and robust DAG patcher scripts
-COPY bootstrapper.py /opt/conda/bin/bootstrapper.py
-COPY dag_patcher.py /opt/conda/bin/dag_patcher.py
+# Create a requirements.txt file with exact Elyra versions
+RUN echo "# Elyra required packages with exact versions\n\
+jinja2==3.0.3\n\
+jupyter-core==4.11.2\n\
+jupyter-client==7.3.1\n\
+nbclient==0.7.0\n\
+nbformat==5.4.0\n\
+nbconvert==6.5.1\n\
+traitlets==5.2.2\n\
+markupsafe==2.1.1\n\
+pyzmq==24.0.1\n\
+tornado==6.1\n\
+prompt-toolkit==3.0.30\n\
+requests==2.27.1\n\
+urllib3==1.26.16\n\
+\n\
+# ROM pipeline required packages\n\
+boto3==1.28.40\n\
+botocore==1.31.40\n\
+minio==7.2.15\n\
+h5py==3.9.0\n\
+numpy==1.24.3\n\
+matplotlib==3.7.2\n\
+scipy==1.11.3\n\
+pandas==2.0.3\n\
+scikit-learn==1.3.0\n\
+plotly==5.15.0\n\
+dash==3.0.4\n\
+pyyaml==6.0.1\n\
+tqdm==4.66.1\n\
+papermill==2.3.4\n\
+ipykernel==6.13.0\n\
+ipython==8.10.0" > /tmp/requirements.txt
 
 # Install all Python packages with pinned versions
 RUN pip install --no-cache-dir -r /tmp/requirements.txt && \
     # Create a backup of installed packages
-    pip freeze > /opt/conda/requirements-current.txt && \
-    # Make scripts executable
-    chmod +x /opt/conda/bin/bootstrapper.py && \
-    chmod +x /opt/conda/bin/dag_patcher.py
+    pip freeze > /opt/conda/requirements-current.txt
 
 # Make pip directories writable for all users
 RUN chmod -R 777 /opt/conda/lib/python3.11/site-packages && \
@@ -43,12 +67,7 @@ RUN mkdir -p /tmp/rom-pipeline-outputs && \
 
 # Create empty requirements files to prevent bootstrapper errors
 RUN touch /opt/conda/requirements-elyra.txt && \
-    touch /opt/conda/requirements-current.txt && \
-    chmod 666 /opt/conda/requirements-elyra.txt && \
-    chmod 666 /opt/conda/requirements-current.txt
-
-# Copy requirements.txt to a permanent location for reference
-COPY requirements.txt /opt/conda/requirements.txt
+    chmod 666 /opt/conda/requirements-elyra.txt
 
 # Switch back to non-root user for better security
 USER $NB_UID
