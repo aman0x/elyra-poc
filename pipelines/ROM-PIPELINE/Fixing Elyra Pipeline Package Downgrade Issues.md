@@ -51,17 +51,17 @@ The only reliable solution is to modify the generated DAG file to remove the boo
 For each KubernetesPodOperator in your DAG file, replace the `arguments` section that looks like:
 
 ```python
-arguments=[
-    "mkdir -p ./jupyter-work-dir/ && cd ./jupyter-work-dir/ && echo 'Downloading https://raw.githubusercontent.com/elyra-ai/elyra/v3.15.0/elyra/airflow/bootstrapper.py' && curl --fail -H 'Cache-Control: no-cache' -L https://raw.githubusercontent.com/elyra-ai/elyra/v3.15.0/elyra/airflow/bootstrapper.py --output bootstrapper.py && echo 'Downloading https://raw.githubusercontent.com/elyra-ai/elyra/v3.15.0/etc/generic/requirements-elyra.txt' && curl --fail -H 'Cache-Control: no-cache' -L https://raw.githubusercontent.com/elyra-ai/elyra/v3.15.0/etc/generic/requirements-elyra.txt --output requirements-elyra.txt && python3 -m pip install packaging && python3 -m pip freeze > requirements-current.txt && python3 bootstrapper.py --pipeline-name 'rom-cylinder' --cos-endpoint http://minio.minio-system.svc.cluster.local:9000 --cos-bucket rom-data --cos-directory 'rom-cylinder-0521181928' --cos-dependencies-archive '0_fetch_data-6014d4a5-f553-44a8-abfa-dae58417a28c.tar.gz' --file 'work/0_fetch_data.ipynb' "
-],
+   arguments=[
+      "mkdir -p ./jupyter-work-dir/ && cd ./jupyter-work-dir/ && echo 'Downloading https://raw.githubusercontent.com/elyra-ai/elyra/v3.15.0/elyra/airflow/bootstrapper.py' && curl --fail -H 'Cache-Control: no-cache' -L https://raw.githubusercontent.com/elyra-ai/elyra/v3.15.0/elyra/airflow/bootstrapper.py --output bootstrapper.py && echo 'Downloading https://raw.githubusercontent.com/elyra-ai/elyra/v3.15.0/etc/generic/requirements-elyra.txt' && curl --fail -H 'Cache-Control: no-cache' -L https://raw.githubusercontent.com/elyra-ai/elyra/v3.15.0/etc/generic/requirements-elyra.txt --output requirements-elyra.txt && python3 -m pip install packaging && python3 -m pip freeze > requirements-current.txt && python3 bootstrapper.py --pipeline-name 'rom-cylinder' --cos-endpoint http://minio.minio-system.svc.cluster.local:9000 --cos-bucket rom-data --cos-directory 'rom-cylinder-0521181928' --cos-dependencies-archive '0_fetch_data-6014d4a5-f553-44a8-abfa-dae58417a28c.tar.gz' --file 'work/0_fetch_data.ipynb' "
+   ],
 ```
 
 With this simplified version:
 
 ```python
-arguments=[
-    "mkdir -p ./jupyter-work-dir/ && cd ./jupyter-work-dir/ && python3 -c 'import sys; import os; import subprocess; import tempfile; import tarfile; from urllib.request import urlopen; from urllib.parse import urljoin; cos_endpoint = \"http://minio.minio-system.svc.cluster.local:9000\"; cos_bucket = \"rom-data\"; cos_directory = \"rom-cylinder-0521181928\"; cos_dependencies_archive = \"0_fetch_data-6014d4a5-f553-44a8-abfa-dae58417a28c.tar.gz\"; notebook_file = \"work/0_fetch_data.ipynb\"; print(f\"Downloading dependencies from {cos_endpoint}/{cos_bucket}/{cos_directory}/{cos_dependencies_archive}\" ); url = urljoin(f\"{cos_endpoint}/\", f\"{cos_bucket}/{cos_directory}/{cos_dependencies_archive}\"); with urlopen(url) as response, tempfile.NamedTemporaryFile() as temp_file: temp_file.write(response.read()); temp_file.flush(); with tarfile.open(temp_file.name, \"r:gz\") as tar: tar.extractall(\".\"); print(f\"Executing notebook {notebook_file}\"); subprocess.run([\"papermill\", notebook_file, notebook_file, \"-p\", \"cos-endpoint\", cos_endpoint, \"-p\", \"cos-bucket\", cos_bucket, \"-p\", \"cos-directory\", cos_directory, \"-p\", \"cos-dependencies-archive\", cos_dependencies_archive], check=True)'"
-],
+    arguments=[
+        "mkdir -p ./jupyter-work-dir/ && cd ./jupyter-work-dir/ && echo 'Downloading https://raw.githubusercontent.com/elyra-ai/elyra/v3.15.0/elyra/airflow/bootstrapper.py' && curl --fail -H 'Cache-Control: no-cache' -L https://raw.githubusercontent.com/elyra-ai/elyra/v3.15.0/elyra/airflow/bootstrapper.py --output bootstrapper.py && echo 'Downloading https://raw.githubusercontent.com/elyra-ai/elyra/v3.15.0/etc/generic/requirements-elyra.txt' && curl --fail -H 'Cache-Control: no-cache' -L https://raw.githubusercontent.com/elyra-ai/elyra/v3.15.0/etc/generic/requirements-elyra.txt --output requirements-elyra.txt && echo 'Skipping pip install' && python3 bootstrapper.py --pipeline-name 'rom-cylinder' --cos-endpoint http://minio.minio-system.svc.cluster.local:9000 --cos-bucket rom-data --cos-directory 'rom-cylinder-0521182921' --cos-dependencies-archive '3_visuazalition-501534df-7597-4371-b989-e422c7eec230.tar.gz' --file 'work/3_visuazalition.ipynb' "
+    ],
 ```
 
 ### What This Patch Does
