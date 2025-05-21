@@ -29,7 +29,7 @@ op_6014d4a5_f553_44a8_abfa_dae58417a28c = KubernetesPodOperator(
     image="ghcr.io/victorfonseca/rom-fluid-dynamics:latest",
     cmds=["sh", "-c"],
     arguments=[
-        "mkdir -p ./jupyter-work-dir/ && cd ./jupyter-work-dir/ && echo 'Downloading https://raw.githubusercontent.com/elyra-ai/elyra/v3.15.0/elyra/airflow/bootstrapper.py' && curl --fail -H 'Cache-Control: no-cache' -L https://raw.githubusercontent.com/elyra-ai/elyra/v3.15.0/elyra/airflow/bootstrapper.py --output bootstrapper.py && echo 'Downloading https://raw.githubusercontent.com/elyra-ai/elyra/v3.15.0/etc/generic/requirements-elyra.txt' && curl --fail -H 'Cache-Control: no-cache' -L https://raw.githubusercontent.com/elyra-ai/elyra/v3.15.0/etc/generic/requirements-elyra.txt --output requirements-elyra.txt && python3 -m pip install packaging && python3 -m pip freeze > requirements-current.txt && python3 bootstrapper.py --pipeline-name 'rom-cylinder' --cos-endpoint http://minio.minio-system.svc.cluster.local:9000 --cos-bucket rom-data --cos-directory 'rom-cylinder-0521181928' --cos-dependencies-archive '0_fetch_data-6014d4a5-f553-44a8-abfa-dae58417a28c.tar.gz' --file 'work/0_fetch_data.ipynb' "
+        "mkdir -p ./jupyter-work-dir/ && cd ./jupyter-work-dir/ && python3 -c \"import sys; import os; import subprocess; import tempfile; import tarfile; from urllib.request import urlopen; from urllib.parse import urljoin; cos_endpoint = 'http://minio.minio-system.svc.cluster.local:9000'; cos_bucket = 'rom-data'; cos_directory = 'rom-cylinder-0521181928'; cos_dependencies_archive = '0_fetch_data-6014d4a5-f553-44a8-abfa-dae58417a28c.tar.gz'; notebook_file = 'work/0_fetch_data.ipynb'; print(f'Downloading dependencies from {cos_endpoint}/{cos_bucket}/{cos_directory}/{cos_dependencies_archive}' ); url = urljoin(f'{cos_endpoint}/', f'{cos_bucket}/{cos_directory}/{cos_dependencies_archive}'); with urlopen(url) as response, tempfile.NamedTemporaryFile() as temp_file: temp_file.write(response.read()); temp_file.flush(); with tarfile.open(temp_file.name, 'r:gz') as tar: tar.extractall('.'); print(f'Executing notebook {notebook_file}'); subprocess.run(['papermill', notebook_file, notebook_file, '-p', 'cos-endpoint', cos_endpoint, '-p', 'cos-bucket', cos_bucket, '-p', 'cos-directory', cos_directory, '-p', 'cos-dependencies-archive', cos_dependencies_archive], check=True)\""
     ],
     task_id="0_fetch_data",
     env_vars={
@@ -58,7 +58,7 @@ op_6014d4a5_f553_44a8_abfa_dae58417a28c = KubernetesPodOperator(
     in_cluster=True,
     config_file="None",
     dag=dag,
-)
+ )
 
 
 # Operator source: work/1_preprocess_data.ipynb
@@ -69,7 +69,7 @@ op_f029183f_8c3e_458f_aeea_79bfd8c119b0 = KubernetesPodOperator(
     image="ghcr.io/victorfonseca/rom-fluid-dynamics:latest",
     cmds=["sh", "-c"],
     arguments=[
-        "mkdir -p ./jupyter-work-dir/ && cd ./jupyter-work-dir/ && echo 'Downloading https://raw.githubusercontent.com/elyra-ai/elyra/v3.15.0/elyra/airflow/bootstrapper.py' && curl --fail -H 'Cache-Control: no-cache' -L https://raw.githubusercontent.com/elyra-ai/elyra/v3.15.0/elyra/airflow/bootstrapper.py --output bootstrapper.py && echo 'Downloading https://raw.githubusercontent.com/elyra-ai/elyra/v3.15.0/etc/generic/requirements-elyra.txt' && curl --fail -H 'Cache-Control: no-cache' -L https://raw.githubusercontent.com/elyra-ai/elyra/v3.15.0/etc/generic/requirements-elyra.txt --output requirements-elyra.txt && python3 -m pip install packaging && python3 -m pip freeze > requirements-current.txt && python3 bootstrapper.py --pipeline-name 'rom-cylinder' --cos-endpoint http://minio.minio-system.svc.cluster.local:9000 --cos-bucket rom-data --cos-directory 'rom-cylinder-0521181928' --cos-dependencies-archive '1_preprocess_data-f029183f-8c3e-458f-aeea-79bfd8c119b0.tar.gz' --file 'work/1_preprocess_data.ipynb' "
+        "mkdir -p ./jupyter-work-dir/ && cd ./jupyter-work-dir/ && python3 -c \"import sys; import os; import subprocess; import tempfile; import tarfile; from urllib.request import urlopen; from urllib.parse import urljoin; cos_endpoint = 'http://minio.minio-system.svc.cluster.local:9000'; cos_bucket = 'rom-data'; cos_directory = 'rom-cylinder-0521181928'; cos_dependencies_archive = '1_preprocess_data-f029183f-8c3e-458f-aeea-79bfd8c119b0.tar.gz'; notebook_file = 'work/1_preprocess_data.ipynb'; print(f'Downloading dependencies from {cos_endpoint}/{cos_bucket}/{cos_directory}/{cos_dependencies_archive}' ); url = urljoin(f'{cos_endpoint}/', f'{cos_bucket}/{cos_directory}/{cos_dependencies_archive}'); with urlopen(url) as response, tempfile.NamedTemporaryFile() as temp_file: temp_file.write(response.read()); temp_file.flush(); with tarfile.open(temp_file.name, 'r:gz') as tar: tar.extractall('.'); print(f'Executing notebook {notebook_file}'); subprocess.run(['papermill', notebook_file, notebook_file, '-p', 'cos-endpoint', cos_endpoint, '-p', 'cos-bucket', cos_bucket, '-p', 'cos-directory', cos_directory, '-p', 'cos-dependencies-archive', cos_dependencies_archive], check=True)\""
     ],
     task_id="1_preprocess_data",
     env_vars={
@@ -98,7 +98,7 @@ op_f029183f_8c3e_458f_aeea_79bfd8c119b0 = KubernetesPodOperator(
     in_cluster=True,
     config_file="None",
     dag=dag,
-)
+ )
 
 op_f029183f_8c3e_458f_aeea_79bfd8c119b0 << op_6014d4a5_f553_44a8_abfa_dae58417a28c
 
@@ -111,7 +111,7 @@ op_4a25aef9_e4dd_4b4a_b281_5ff2a04ad00a = KubernetesPodOperator(
     image="ghcr.io/victorfonseca/rom-fluid-dynamics:latest",
     cmds=["sh", "-c"],
     arguments=[
-        "mkdir -p ./jupyter-work-dir/ && cd ./jupyter-work-dir/ && echo 'Downloading https://raw.githubusercontent.com/elyra-ai/elyra/v3.15.0/elyra/airflow/bootstrapper.py' && curl --fail -H 'Cache-Control: no-cache' -L https://raw.githubusercontent.com/elyra-ai/elyra/v3.15.0/elyra/airflow/bootstrapper.py --output bootstrapper.py && echo 'Downloading https://raw.githubusercontent.com/elyra-ai/elyra/v3.15.0/etc/generic/requirements-elyra.txt' && curl --fail -H 'Cache-Control: no-cache' -L https://raw.githubusercontent.com/elyra-ai/elyra/v3.15.0/etc/generic/requirements-elyra.txt --output requirements-elyra.txt && python3 -m pip install packaging && python3 -m pip freeze > requirements-current.txt && python3 bootstrapper.py --pipeline-name 'rom-cylinder' --cos-endpoint http://minio.minio-system.svc.cluster.local:9000 --cos-bucket rom-data --cos-directory 'rom-cylinder-0521181928' --cos-dependencies-archive '2_rom_modeling-4a25aef9-e4dd-4b4a-b281-5ff2a04ad00a.tar.gz' --file 'work/2_rom_modeling.ipynb' "
+        "mkdir -p ./jupyter-work-dir/ && cd ./jupyter-work-dir/ && python3 -c \"import sys; import os; import subprocess; import tempfile; import tarfile; from urllib.request import urlopen; from urllib.parse import urljoin; cos_endpoint = 'http://minio.minio-system.svc.cluster.local:9000'; cos_bucket = 'rom-data'; cos_directory = 'rom-cylinder-0521181928'; cos_dependencies_archive = '2_rom_modeling-4a25aef9-e4dd-4b4a-b281-5ff2a04ad00a.tar.gz'; notebook_file = 'work/2_rom_modeling.ipynb'; print(f'Downloading dependencies from {cos_endpoint}/{cos_bucket}/{cos_directory}/{cos_dependencies_archive}' ); url = urljoin(f'{cos_endpoint}/', f'{cos_bucket}/{cos_directory}/{cos_dependencies_archive}'); with urlopen(url) as response, tempfile.NamedTemporaryFile() as temp_file: temp_file.write(response.read()); temp_file.flush(); with tarfile.open(temp_file.name, 'r:gz') as tar: tar.extractall('.'); print(f'Executing notebook {notebook_file}'); subprocess.run(['papermill', notebook_file, notebook_file, '-p', 'cos-endpoint', cos_endpoint, '-p', 'cos-bucket', cos_bucket, '-p', 'cos-directory', cos_directory, '-p', 'cos-dependencies-archive', cos_dependencies_archive], check=True)\""
     ],
     task_id="2_rom_modeling",
     env_vars={
@@ -140,7 +140,7 @@ op_4a25aef9_e4dd_4b4a_b281_5ff2a04ad00a = KubernetesPodOperator(
     in_cluster=True,
     config_file="None",
     dag=dag,
-)
+ )
 
 op_4a25aef9_e4dd_4b4a_b281_5ff2a04ad00a << op_f029183f_8c3e_458f_aeea_79bfd8c119b0
 
@@ -153,7 +153,7 @@ op_501534df_7597_4371_b989_e422c7eec230 = KubernetesPodOperator(
     image="ghcr.io/victorfonseca/rom-fluid-dynamics:latest",
     cmds=["sh", "-c"],
     arguments=[
-        "mkdir -p ./jupyter-work-dir/ && cd ./jupyter-work-dir/ && echo 'Downloading https://raw.githubusercontent.com/elyra-ai/elyra/v3.15.0/elyra/airflow/bootstrapper.py' && curl --fail -H 'Cache-Control: no-cache' -L https://raw.githubusercontent.com/elyra-ai/elyra/v3.15.0/elyra/airflow/bootstrapper.py --output bootstrapper.py && echo 'Downloading https://raw.githubusercontent.com/elyra-ai/elyra/v3.15.0/etc/generic/requirements-elyra.txt' && curl --fail -H 'Cache-Control: no-cache' -L https://raw.githubusercontent.com/elyra-ai/elyra/v3.15.0/etc/generic/requirements-elyra.txt --output requirements-elyra.txt && python3 -m pip install packaging && python3 -m pip freeze > requirements-current.txt && python3 bootstrapper.py --pipeline-name 'rom-cylinder' --cos-endpoint http://minio.minio-system.svc.cluster.local:9000 --cos-bucket rom-data --cos-directory 'rom-cylinder-0521181928' --cos-dependencies-archive '3_visuazalition-501534df-7597-4371-b989-e422c7eec230.tar.gz' --file 'work/3_visuazalition.ipynb' "
+        "mkdir -p ./jupyter-work-dir/ && cd ./jupyter-work-dir/ && python3 -c \"import sys; import os; import subprocess; import tempfile; import tarfile; from urllib.request import urlopen; from urllib.parse import urljoin; cos_endpoint = 'http://minio.minio-system.svc.cluster.local:9000'; cos_bucket = 'rom-data'; cos_directory = 'rom-cylinder-0521181928'; cos_dependencies_archive = '3_visuazalition-501534df-7597-4371-b989-e422c7eec230.tar.gz'; notebook_file = 'work/3_visuazalition.ipynb'; print(f'Downloading dependencies from {cos_endpoint}/{cos_bucket}/{cos_directory}/{cos_dependencies_archive}' ); url = urljoin(f'{cos_endpoint}/', f'{cos_bucket}/{cos_directory}/{cos_dependencies_archive}'); with urlopen(url) as response, tempfile.NamedTemporaryFile() as temp_file: temp_file.write(response.read()); temp_file.flush(); with tarfile.open(temp_file.name, 'r:gz') as tar: tar.extractall('.'); print(f'Executing notebook {notebook_file}'); subprocess.run(['papermill', notebook_file, notebook_file, '-p', 'cos-endpoint', cos_endpoint, '-p', 'cos-bucket', cos_bucket, '-p', 'cos-directory', cos_directory, '-p', 'cos-dependencies-archive', cos_dependencies_archive], check=True)\""
     ],
     task_id="3_visuazalition",
     env_vars={
@@ -182,6 +182,6 @@ op_501534df_7597_4371_b989_e422c7eec230 = KubernetesPodOperator(
     in_cluster=True,
     config_file="None",
     dag=dag,
-)
+ )
 
 op_501534df_7597_4371_b989_e422c7eec230 << op_4a25aef9_e4dd_4b4a_b281_5ff2a04ad00a
