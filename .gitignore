@@ -79,12 +79,3 @@ docker-compose.override.yml
 logs/
 airflow.cfg
 untracked/
-
-# Ignore pipeline artifacts
-*.pipeline
-
-# Ignore images
-*.png
-*.jpg
-*.jpeg
-*.svg
