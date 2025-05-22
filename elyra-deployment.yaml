@@ -65,6 +65,19 @@ spec:
     requests:
       storage: 10Gi
 ---
+# PersistentVolumeClaim for Elyra home directory
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: elyra-home-pvc
+  namespace: elyra-system
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 5Gi
+---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -109,6 +122,8 @@ spec:
           mountPath: /home/jovyan/.local
         - name: elyra-work
           mountPath: /home/jovyan/work
+        - name: elyra-home
+          mountPath: /home/jovyan
         resources:
           requests:
             memory: "1Gi"
@@ -139,6 +154,9 @@ spec:
       - name: elyra-work
         persistentVolumeClaim:
           claimName: elyra-work-pvc
+      - name: elyra-home
+        persistentVolumeClaim:
+          claimName: elyra-home-pvc
 ---
 apiVersion: v1
 kind: Service

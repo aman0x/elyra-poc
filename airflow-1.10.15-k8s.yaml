@@ -69,35 +69,59 @@ metadata:
 data:
   git-sync.sh: |
     #!/bin/sh
-    # Initial clone
-    git clone --single-branch --branch main https://github.com/victorfonseca/elyra-poc.git /tmp/repo
-    mkdir -p /opt/airflow/dags
+    set -e
+    REPO_URL="${GIT_REPO_URL:-https://github.com/victorfonseca/elyra-poc.git}"
+    REPO_BRANCH="${GIT_BRANCH:-main}"
+    REPO_DIR="/tmp/repo"
+    DAGS_SRC="/tmp/repo/tests/dags"
+    DAGS_DST="/opt/airflow/dags"
+    GIT_TOKEN="${GIT_TOKEN:-}"
     
-    # Initial sync - only if directory exists
-    if [ -d "/tmp/repo/tests/dags" ]; then
-      cp -r /tmp/repo/tests/dags/* /opt/airflow/dags/
-      echo "Initial DAGs synchronized successfully"
-    else
-      echo "Warning: /tmp/repo/tests/dags directory not found during initial sync"
+    # If GIT_TOKEN is set, use it for authentication
+    if [ -n "$GIT_TOKEN" ]; then
+      REPO_URL="https://${GIT_TOKEN}@${REPO_URL#https://}"
     fi
     
-    # Continuous sync every 60 seconds
+    # Initial clone with retry logic
+    for i in 1 2 3; do
+      if git clone --single-branch --branch "$REPO_BRANCH" "$REPO_URL" "$REPO_DIR"; then
+        echo "Git clone succeeded"
+        break
+      else
+        echo "Git clone failed, retry $i/3"
+        sleep 5
+      fi
+    done
+    mkdir -p "$DAGS_DST"
+    
+    # Initial sync - only if directory exists
+    if [ -d "$DAGS_SRC" ]; then
+      cp -r "$DAGS_SRC"/* "$DAGS_DST"/
+      echo "Initial DAGs synchronized successfully"
+    else
+      echo "Warning: $DAGS_SRC directory not found during initial sync"
+    fi
+    
+    # Continuous sync every 10 seconds
     while true; do
       echo "Syncing repository..."
-      cd /tmp/repo && git pull
-      
+      if cd "$REPO_DIR" && git pull; then
+        echo "Git pull succeeded"
+      else
+        echo "Git pull failed, skipping this sync cycle"
+        sleep 10
+        continue
+      fi
       # Clean destination directory first (preserve __pycache__)
-      find /opt/airflow/dags -type f -name "*.py" -delete
-      
+      find "$DAGS_DST" -type f -name "*.py" -delete
       # Copy only if the directory exists
-      if [ -d "/tmp/repo/tests/dags" ]; then
-        cp -r /tmp/repo/tests/dags/* /opt/airflow/dags/
+      if [ -d "$DAGS_SRC" ]; then
+        cp -r "$DAGS_SRC"/* "$DAGS_DST"/
         echo "DAGs synchronized successfully"
       else
-        echo "Warning: /tmp/repo/tests/dags directory not found"
+        echo "Warning: $DAGS_SRC directory not found"
       fi
-      
-      sleep 60
+      sleep 10
     done
 ---
 # PVC for DAGs
