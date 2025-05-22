@@ -49,7 +49,7 @@ kubectl exec -n airflow-elyra $WEBSERVER_POD -c airflow-webserver -- cat /opt/ai
 
 ```bash
 # Check if the DAG is recognized by Airflow (replace YOUR_DAG_ID with your actual DAG ID)
-kubectl exec -n airflow-elyra $WEBSERVER_POD -c airflow-webserver -- airflow list_dags | grep YOUR_DAG_ID
+kubectl exec -n airflow-elyra $WEBSERVER_POD -c airflow-webserver -- airflow dags list | grep YOUR_DAG_ID
 ```
 
 If Airflow can recognize your DAG, it means the DAG file syntax is correct.
