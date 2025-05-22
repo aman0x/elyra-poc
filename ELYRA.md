@@ -67,6 +67,17 @@ kubectl exec -it -n elyra-system $(kubectl get pods -n elyra-system -o name | he
 elyra-metadata list component-catalogs
 ```
 
+## FAQ & Known Warnings
+
+- When starting Elyra, you may see log messages like:
+
+  - `[W ...] Operator 'BranchPythonOperator' ... does not have an __init__ function. Skipping...`
+  - `[W ...] Operator 'ShortCircuitOperator' ... does not have an __init__ function. Skipping...`
+  - `[W ...] Operator 'LatestOnlyOperator' ... does not have an __init__ function. Skipping...`
+  - `[W ...] Operator 'BaseBranchOperator' ... does not have an __init__ function. Skipping...`
+
+- These warnings are expected and do not indicate a problem. Elyra will still function correctly and all required components will be available.
+
 ### 6. Delete the Deployment
 
 ```bash

@@ -18,18 +18,22 @@ data:
     # Create directories for metadata
     mkdir -p /home/jovyan/.local/share/jupyter/metadata/component-catalogs/
     
-    # Create the Airflow package catalog using the CLI tool
-    echo "Creating Airflow package catalog..."
-    elyra-metadata create component-catalogs \
-      --schema_name=airflow-package-catalog \
-      --name="airflow-1-10-15" \
-      --display_name="Apache Airflow 1.10.15 Components" \
-      --description="Apache Airflow 1.10.15 operators and components" \
-      --runtime_type="APACHE_AIRFLOW" \
-      --categories="Core packages" \
-      --airflow_package_download_url="https://files.pythonhosted.org/packages/f0/3a/f5ce74b2bdbbe59c925bb3398ec0781b66a64b8a23e2f6adc7ab9f1005d9/apache_airflow-1.10.15-py2.py3-none-any.whl" \
-      --search_contrib=true
-    
+    # Check if the Airflow package catalog already exists
+    if ! elyra-metadata list component-catalogs | grep -q 'airflow-1-10-15'; then
+      echo "Creating Airflow package catalog..."
+      elyra-metadata create component-catalogs \
+        --schema_name=airflow-package-catalog \
+        --name="airflow-1-10-15" \
+        --display_name="Apache Airflow 1.10.15 Components" \
+        --description="Apache Airflow 1.10.15 operators and components" \
+        --runtime_type="APACHE_AIRFLOW" \
+        --categories="Core packages" \
+        --airflow_package_download_url="https://files.pythonhosted.org/packages/f0/3a/f5ce74b2bdbbe59c925bb3398ec0781b66a64b8a23e2f6adc7ab9f1005d9/apache_airflow-1.10.15-py2.py3-none-any.whl" \
+        --search_contrib=true
+    else
+      echo "Airflow package catalog already exists. Skipping creation."
+    fi
+
     # List catalogs to verify
     echo "Verifying catalog was created:"
     elyra-metadata list component-catalogs
