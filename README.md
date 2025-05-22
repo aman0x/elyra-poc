@@ -17,6 +17,15 @@ This project demonstrates deploying Apache Airflow 1.10.15 on Kubernetes for int
 - `tests/`: Test DAGs and scripts
 
 ## Prerequisites
+**Important: Fork & GitHub Token Setup**
+
+To enable Airflow to fetch DAGs from your repository, you must:
+
+- **Fork this repository** to your own GitHub account.
+- **Create a GitHub Personal Access Token (classic)** with repo access ([GitHub token creation guide](https://github.com/settings/tokens?type=classic)).
+- **Add your GitHub token** to the Airflow Runtime configuration as a secret or environment variable. This allows Airflow to synchronize DAGs from your forked repository securely.
+- For a visual example, see the reference in `Airflow Runtime Example.png` in this repository.
+
 - Kubernetes cluster (v1.18+ recommended)
 - `kubectl` configured for your cluster
 - Helm (for Helm-based deployments)

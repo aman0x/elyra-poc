@@ -9,6 +9,13 @@ This pipeline demonstrates Reduced Order Modeling (ROM) using the Cylinder Flow 
 - **Why it's great:** Complete ROM implementation, well-documented, small enough for most laptops
 - **Download:** [Cylinder Data (HDF5)](https://drive.google.com/open?id=1cqxzDNG6ic1HqC7vmjq_bBmGFB9qYihp)
 
+### MinIO Bucket and Folder Structure
+- **Bucket name:** `rom-data`
+- **Required structure inside the bucket:**
+  - `/examples/cylinder/cylinder_data.hdf5`
+  - That is, the root of the bucket must have a folder called `examples`, inside it a folder `cylinder`, and inside that the file `cylinder_data.hdf5`.
+- Ensure this structure exists in your MinIO instance before running the pipeline.
+
 ## Pipeline Structure
 This pipeline consists of three main notebooks:
 1. **0_fetch_data.ipynb**: Downloads and inspects the Cylinder Flow dataset from MinIO or Google Drive, uploads to MinIO, and verifies data integrity.
