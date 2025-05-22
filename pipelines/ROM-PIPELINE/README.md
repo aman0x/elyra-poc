@@ -25,7 +25,7 @@ This pipeline consists of three main notebooks:
 ## Prerequisites
 - Python 3.8+
 - Jupyter Notebook or Elyra Pipeline environment
-- Access to MinIO or S3-compatible storage (default: minioadmin/minioadmin)
+- Access to MinIO or S3-compatible storage (default: minio/minio123)
 - Packages: numpy, h5py, matplotlib, boto3, psutil
 
 ## Environment Setup
@@ -36,9 +36,9 @@ pip install numpy h5py matplotlib boto3 psutil
 
 Set environment variables for MinIO/S3 if needed:
 ```bash
-export S3_ENDPOINT=http://minio:9000
-export AWS_ACCESS_KEY_ID=minioadmin
-export AWS_SECRET_ACCESS_KEY=minioadmin
+export S3_ENDPOINT=http://minio.minio-system.svc.cluster.local:9000
+export AWS_ACCESS_KEY_ID=minio
+export AWS_SECRET_ACCESS_KEY=minio123
 ```
 
 ## Running the Pipeline
