@@ -1,0 +1,1393 @@
+{
+  "doc_type": "pipeline",
+  "version": "3.0",
+  "json_schema": "http://api.dataplatform.ibm.com/schemas/common-pipeline/pipeline-flow/pipeline-flow-v3-schema.json",
+  "id": "qa-feature-engineering-pipeline",
+  "primary_pipeline": "primary",
+  "pipelines": [
+    {
+      "id": "primary",
+      "nodes": [
+        {
+          "id": "data-loader-tr1-tr2",
+          "type": "execution_node",
+          "op": "execute-python-node",
+          "app_data": {
+            "component_parameters": {
+              "dependencies": [],
+              "include_subdirectories": false,
+              "outputs": [],
+              "env_vars": [
+                {
+                  "env_var": "MINIO_ENDPOINT",
+                  "value": "http://minio.minio-system.svc.cluster.local:9000"
+                },
+                {
+                  "env_var": "MINIO_ACCESS_KEY",
+                  "value": "minio"
+                },
+                {
+                  "env_var": "MINIO_SECRET_KEY",
+                  "value": "minio123"
+                },
+                {
+                  "env_var": "INPUT_BUCKET",
+                  "value": "customer-bucket"
+                },
+                {
+                  "env_var": "INPUT_CSV",
+                  "value": "TR1_TR2.csv"
+                },
+                {
+                  "env_var": "OUTPUT_BUCKET",
+                  "value": "customer-bucket"
+                },
+                {
+                  "env_var": "OUTPUT_PREFIX",
+                  "value": "qa-pipeline"
+                },
+                {
+                  "env_var": "OUTPUT_FILENAME",
+                  "value": "tr1_tr2_raw.pkl"
+                }
+              ],
+              "kubernetes_pod_annotations": [],
+              "kubernetes_pod_labels": [],
+              "kubernetes_secrets": [],
+              "kubernetes_shared_mem_size": {},
+              "kubernetes_tolerations": [],
+              "mounted_volumes": [],
+              "filename": "load_data_from_s3.py",
+              "runtime_image": "continuumio/anaconda3@sha256:a2816acd3acda208d92e0bf6c11eb41fda9009ea20f24e123dbf84bb4bd4c4b8"
+            },
+            "label": "LOAD TR1_TR2 DATA",
+            "ui_data": {
+              "label": "LOAD TR1_TR2 DATA",
+              "image": "/static/elyra/python.svg",
+              "x_pos": 50,
+              "y_pos": 100,
+              "description": "Run Python script"
+            }
+          },
+          "inputs": [
+            {
+              "id": "inPort",
+              "app_data": {
+                "ui_data": {
+                  "cardinality": {
+                    "min": 0,
+                    "max": -1
+                  },
+                  "label": "Input Port"
+                }
+              }
+            }
+          ],
+          "outputs": [
+            {
+              "id": "outPort",
+              "app_data": {
+                "ui_data": {
+                  "cardinality": {
+                    "min": 0,
+                    "max": -1
+                  },
+                  "label": "Output Port"
+                }
+              }
+            }
+          ]
+        },
+        {
+          "id": "initial-quality-check",
+          "type": "execution_node",
+          "op": "execute-python-node",
+          "app_data": {
+            "component_parameters": {
+              "dependencies": [],
+              "include_subdirectories": false,
+              "outputs": [],
+              "env_vars": [
+                {
+                  "env_var": "TEST_MODE",
+                  "value": "s3"
+                },
+                {
+                  "env_var": "MINIO_ENDPOINT",
+                  "value": "http://minio.minio-system.svc.cluster.local:9000"
+                },
+                {
+                  "env_var": "MINIO_ACCESS_KEY",
+                  "value": "minio"
+                },
+                {
+                  "env_var": "MINIO_SECRET_KEY",
+                  "value": "minio123"
+                },
+                {
+                  "env_var": "INPUT_BUCKET",
+                  "value": "customer-bucket"
+                },
+                {
+                  "env_var": "INPUT_KEY",
+                  "value": "qa-pipeline/tr1_tr2_raw.pkl"
+                },
+                {
+                  "env_var": "OUTPUT_BUCKET",
+                  "value": "customer-bucket"
+                },
+                {
+                  "env_var": "OUTPUT_PREFIX",
+                  "value": "qa-pipeline"
+                },
+                {
+                  "env_var": "CHAIN_TRANSFORMATIONS",
+                  "value": "false"
+                },
+                {
+                  "env_var": "UPDATE_RAW_DATA",
+                  "value": "false"
+                },
+                {
+                  "env_var": "NULL_STRATEGY",
+                  "value": "drop_cols"
+                },
+                {
+                  "env_var": "NULL_THRESHOLD",
+                  "value": "0.7"
+                }
+              ],
+              "kubernetes_pod_annotations": [],
+              "kubernetes_pod_labels": [],
+              "kubernetes_secrets": [],
+              "kubernetes_shared_mem_size": {},
+              "kubernetes_tolerations": [],
+              "mounted_volumes": [],
+              "filename": "clean_null_values.py",
+              "runtime_image": "continuumio/anaconda3@sha256:a2816acd3acda208d92e0bf6c11eb41fda9009ea20f24e123dbf84bb4bd4c4b8"
+            },
+            "label": "INITIAL QUALITY CHECK",
+            "ui_data": {
+              "label": "INITIAL QUALITY CHECK",
+              "image": "/static/elyra/python.svg",
+              "x_pos": 250,
+              "y_pos": 100,
+              "description": "Run Python script"
+            }
+          },
+          "inputs": [
+            {
+              "id": "inPort",
+              "app_data": {
+                "ui_data": {
+                  "cardinality": {
+                    "min": 0,
+                    "max": -1
+                  },
+                  "label": "Input Port"
+                }
+              },
+              "links": [
+                {
+                  "id": "loader-to-quality-check",
+                  "node_id_ref": "data-loader-tr1-tr2",
+                  "port_id_ref": "outPort"
+                }
+              ]
+            }
+          ],
+          "outputs": [
+            {
+              "id": "outPort",
+              "app_data": {
+                "ui_data": {
+                  "cardinality": {
+                    "min": 0,
+                    "max": -1
+                  },
+                  "label": "Output Port"
+                }
+              }
+            }
+          ]
+        },
+        {
+          "id": "feature-engineering-mean-fill",
+          "type": "execution_node",
+          "op": "execute-python-node",
+          "app_data": {
+            "component_parameters": {
+              "dependencies": [],
+              "include_subdirectories": false,
+              "outputs": [],
+              "env_vars": [
+                {
+                  "env_var": "TEST_MODE",
+                  "value": "s3"
+                },
+                {
+                  "env_var": "MINIO_ENDPOINT",
+                  "value": "http://minio.minio-system.svc.cluster.local:9000"
+                },
+                {
+                  "env_var": "MINIO_ACCESS_KEY",
+                  "value": "minio"
+                },
+                {
+                  "env_var": "MINIO_SECRET_KEY",
+                  "value": "minio123"
+                },
+                {
+                  "env_var": "INPUT_BUCKET",
+                  "value": "customer-bucket"
+                },
+                {
+                  "env_var": "INPUT_KEY",
+                  "value": "qa-pipeline/nulls_cleaned_data.pkl"
+                },
+                {
+                  "env_var": "OUTPUT_BUCKET",
+                  "value": "customer-bucket"
+                },
+                {
+                  "env_var": "OUTPUT_PREFIX",
+                  "value": "qa-pipeline/mean-fill-branch"
+                },
+                {
+                  "env_var": "CHAIN_TRANSFORMATIONS",
+                  "value": "false"
+                },
+                {
+                  "env_var": "UPDATE_RAW_DATA",
+                  "value": "false"
+                },
+                {
+                  "env_var": "NULL_STRATEGY",
+                  "value": "fill_mean"
+                },
+                {
+                  "env_var": "NULL_THRESHOLD",
+                  "value": "0.5"
+                }
+              ],
+              "kubernetes_pod_annotations": [],
+              "kubernetes_pod_labels": [],
+              "kubernetes_secrets": [],
+              "kubernetes_shared_mem_size": {},
+              "kubernetes_tolerations": [],
+              "mounted_volumes": [],
+              "filename": "clean_null_values.py",
+              "runtime_image": "continuumio/anaconda3@sha256:a2816acd3acda208d92e0bf6c11eb41fda9009ea20f24e123dbf84bb4bd4c4b8"
+            },
+            "label": "FEATURE ENG - MEAN FILL",
+            "ui_data": {
+              "label": "FEATURE ENG - MEAN FILL",
+              "image": "/static/elyra/python.svg",
+              "x_pos": 450,
+              "y_pos": 50,
+              "description": "Run Python script"
+            }
+          },
+          "inputs": [
+            {
+              "id": "inPort",
+              "app_data": {
+                "ui_data": {
+                  "cardinality": {
+                    "min": 0,
+                    "max": -1
+                  },
+                  "label": "Input Port"
+                }
+              },
+              "links": [
+                {
+                  "id": "quality-to-mean-fill",
+                  "node_id_ref": "initial-quality-check",
+                  "port_id_ref": "outPort"
+                }
+              ]
+            }
+          ],
+          "outputs": [
+            {
+              "id": "outPort",
+              "app_data": {
+                "ui_data": {
+                  "cardinality": {
+                    "min": 0,
+                    "max": -1
+                  },
+                  "label": "Output Port"
+                }
+              }
+            }
+          ]
+        },
+        {
+          "id": "feature-engineering-median-fill",
+          "type": "execution_node",
+          "op": "execute-python-node",
+          "app_data": {
+            "component_parameters": {
+              "dependencies": [],
+              "include_subdirectories": false,
+              "outputs": [],
+              "env_vars": [
+                {
+                  "env_var": "TEST_MODE",
+                  "value": "s3"
+                },
+                {
+                  "env_var": "MINIO_ENDPOINT",
+                  "value": "http://minio.minio-system.svc.cluster.local:9000"
+                },
+                {
+                  "env_var": "MINIO_ACCESS_KEY",
+                  "value": "minio"
+                },
+                {
+                  "env_var": "MINIO_SECRET_KEY",
+                  "value": "minio123"
+                },
+                {
+                  "env_var": "INPUT_BUCKET",
+                  "value": "customer-bucket"
+                },
+                {
+                  "env_var": "INPUT_KEY",
+                  "value": "qa-pipeline/nulls_cleaned_data.pkl"
+                },
+                {
+                  "env_var": "OUTPUT_BUCKET",
+                  "value": "customer-bucket"
+                },
+                {
+                  "env_var": "OUTPUT_PREFIX",
+                  "value": "qa-pipeline/median-fill-branch"
+                },
+                {
+                  "env_var": "CHAIN_TRANSFORMATIONS",
+                  "value": "false"
+                },
+                {
+                  "env_var": "UPDATE_RAW_DATA",
+                  "value": "false"
+                },
+                {
+                  "env_var": "NULL_STRATEGY",
+                  "value": "fill_median"
+                },
+                {
+                  "env_var": "NULL_THRESHOLD",
+                  "value": "0.5"
+                }
+              ],
+              "kubernetes_pod_annotations": [],
+              "kubernetes_pod_labels": [],
+              "kubernetes_secrets": [],
+              "kubernetes_shared_mem_size": {},
+              "kubernetes_tolerations": [],
+              "mounted_volumes": [],
+              "filename": "clean_null_values.py",
+              "runtime_image": "continuumio/anaconda3@sha256:a2816acd3acda208d92e0bf6c11eb41fda9009ea20f24e123dbf84bb4bd4c4b8"
+            },
+            "label": "FEATURE ENG - MEDIAN FILL",
+            "ui_data": {
+              "label": "FEATURE ENG - MEDIAN FILL",
+              "image": "/static/elyra/python.svg",
+              "x_pos": 450,
+              "y_pos": 150,
+              "description": "Run Python script"
+            }
+          },
+          "inputs": [
+            {
+              "id": "inPort",
+              "app_data": {
+                "ui_data": {
+                  "cardinality": {
+                    "min": 0,
+                    "max": -1
+                  },
+                  "label": "Input Port"
+                }
+              },
+              "links": [
+                {
+                  "id": "quality-to-median-fill",
+                  "node_id_ref": "initial-quality-check",
+                  "port_id_ref": "outPort"
+                }
+              ]
+            }
+          ],
+          "outputs": [
+            {
+              "id": "outPort",
+              "app_data": {
+                "ui_data": {
+                  "cardinality": {
+                    "min": 0,
+                    "max": -1
+                  },
+                  "label": "Output Port"
+                }
+              }
+            }
+          ]
+        },
+        {
+          "id": "statistical-validation-zscore",
+          "type": "execution_node",
+          "op": "execute-python-node",
+          "app_data": {
+            "component_parameters": {
+              "dependencies": [],
+              "include_subdirectories": false,
+              "outputs": [],
+              "env_vars": [
+                {
+                  "env_var": "TEST_MODE",
+                  "value": "s3"
+                },
+                {
+                  "env_var": "MINIO_ENDPOINT",
+                  "value": "http://minio.minio-system.svc.cluster.local:9000"
+                },
+                {
+                  "env_var": "MINIO_ACCESS_KEY",
+                  "value": "minio"
+                },
+                {
+                  "env_var": "MINIO_SECRET_KEY",
+                  "value": "minio123"
+                },
+                {
+                  "env_var": "INPUT_BUCKET",
+                  "value": "customer-bucket"
+                },
+                {
+                  "env_var": "INPUT_KEY",
+                  "value": "qa-pipeline/mean-fill-branch/nulls_cleaned_data.pkl"
+                },
+                {
+                  "env_var": "OUTPUT_BUCKET",
+                  "value": "customer-bucket"
+                },
+                {
+                  "env_var": "OUTPUT_PREFIX",
+                  "value": "qa-pipeline/mean-fill-branch"
+                },
+                {
+                  "env_var": "CHAIN_TRANSFORMATIONS",
+                  "value": "false"
+                },
+                {
+                  "env_var": "UPDATE_RAW_DATA",
+                  "value": "false"
+                },
+                {
+                  "env_var": "OUTLIER_METHOD",
+                  "value": "zscore"
+                },
+                {
+                  "env_var": "OUTLIER_THRESHOLD",
+                  "value": "2.5"
+                },
+                {
+                  "env_var": "OUTLIER_ACTION",
+                  "value": "remove"
+                }
+              ],
+              "kubernetes_pod_annotations": [],
+              "kubernetes_pod_labels": [],
+              "kubernetes_secrets": [],
+              "kubernetes_shared_mem_size": {},
+              "kubernetes_tolerations": [],
+              "mounted_volumes": [],
+              "filename": "remove_outliers.py",
+              "runtime_image": "continuumio/anaconda3@sha256:a2816acd3acda208d92e0bf6c11eb41fda9009ea20f24e123dbf84bb4bd4c4b8"
+            },
+            "label": "STATISTICAL VALIDATION - ZSCORE",
+            "ui_data": {
+              "label": "STATISTICAL VALIDATION - ZSCORE",
+              "image": "/static/elyra/python.svg",
+              "x_pos": 650,
+              "y_pos": 50,
+              "description": "Run Python script"
+            }
+          },
+          "inputs": [
+            {
+              "id": "inPort",
+              "app_data": {
+                "ui_data": {
+                  "cardinality": {
+                    "min": 0,
+                    "max": -1
+                  },
+                  "label": "Input Port"
+                }
+              },
+              "links": [
+                {
+                  "id": "mean-fill-to-zscore",
+                  "node_id_ref": "feature-engineering-mean-fill",
+                  "port_id_ref": "outPort"
+                }
+              ]
+            }
+          ],
+          "outputs": [
+            {
+              "id": "outPort",
+              "app_data": {
+                "ui_data": {
+                  "cardinality": {
+                    "min": 0,
+                    "max": -1
+                  },
+                  "label": "Output Port"
+                }
+              }
+            }
+          ]
+        },
+        {
+          "id": "statistical-validation-modified-zscore",
+          "type": "execution_node",
+          "op": "execute-python-node",
+          "app_data": {
+            "component_parameters": {
+              "dependencies": [],
+              "include_subdirectories": false,
+              "outputs": [],
+              "env_vars": [
+                {
+                  "env_var": "TEST_MODE",
+                  "value": "s3"
+                },
+                {
+                  "env_var": "MINIO_ENDPOINT",
+                  "value": "http://minio.minio-system.svc.cluster.local:9000"
+                },
+                {
+                  "env_var": "MINIO_ACCESS_KEY",
+                  "value": "minio"
+                },
+                {
+                  "env_var": "MINIO_SECRET_KEY",
+                  "value": "minio123"
+                },
+                {
+                  "env_var": "INPUT_BUCKET",
+                  "value": "customer-bucket"
+                },
+                {
+                  "env_var": "INPUT_KEY",
+                  "value": "qa-pipeline/median-fill-branch/nulls_cleaned_data.pkl"
+                },
+                {
+                  "env_var": "OUTPUT_BUCKET",
+                  "value": "customer-bucket"
+                },
+                {
+                  "env_var": "OUTPUT_PREFIX",
+                  "value": "qa-pipeline/median-fill-branch"
+                },
+                {
+                  "env_var": "CHAIN_TRANSFORMATIONS",
+                  "value": "false"
+                },
+                {
+                  "env_var": "UPDATE_RAW_DATA",
+                  "value": "false"
+                },
+                {
+                  "env_var": "OUTLIER_METHOD",
+                  "value": "modified_zscore"
+                },
+                {
+                  "env_var": "OUTLIER_THRESHOLD",
+                  "value": "3.0"
+                },
+                {
+                  "env_var": "OUTLIER_ACTION",
+                  "value": "remove"
+                }
+              ],
+              "kubernetes_pod_annotations": [],
+              "kubernetes_pod_labels": [],
+              "kubernetes_secrets": [],
+              "kubernetes_shared_mem_size": {},
+              "kubernetes_tolerations": [],
+              "mounted_volumes": [],
+              "filename": "remove_outliers.py",
+              "runtime_image": "continuumio/anaconda3@sha256:a2816acd3acda208d92e0bf6c11eb41fda9009ea20f24e123dbf84bb4bd4c4b8"
+            },
+            "label": "STATISTICAL VALIDATION - MOD ZSCORE",
+            "ui_data": {
+              "label": "STATISTICAL VALIDATION - MOD ZSCORE",
+              "image": "/static/elyra/python.svg",
+              "x_pos": 650,
+              "y_pos": 150,
+              "description": "Run Python script"
+            }
+          },
+          "inputs": [
+            {
+              "id": "inPort",
+              "app_data": {
+                "ui_data": {
+                  "cardinality": {
+                    "min": 0,
+                    "max": -1
+                  },
+                  "label": "Input Port"
+                }
+              },
+              "links": [
+                {
+                  "id": "median-fill-to-mod-zscore",
+                  "node_id_ref": "feature-engineering-median-fill",
+                  "port_id_ref": "outPort"
+                }
+              ]
+            }
+          ],
+          "outputs": [
+            {
+              "id": "outPort",
+              "app_data": {
+                "ui_data": {
+                  "cardinality": {
+                    "min": 0,
+                    "max": -1
+                  },
+                  "label": "Output Port"
+                }
+              }
+            }
+          ]
+        },
+        {
+          "id": "quality-assurance-dedup-mean-branch",
+          "type": "execution_node",
+          "op": "execute-python-node",
+          "app_data": {
+            "component_parameters": {
+              "dependencies": [],
+              "include_subdirectories": false,
+              "outputs": [],
+              "env_vars": [
+                {
+                  "env_var": "TEST_MODE",
+                  "value": "s3"
+                },
+                {
+                  "env_var": "MINIO_ENDPOINT",
+                  "value": "http://minio.minio-system.svc.cluster.local:9000"
+                },
+                {
+                  "env_var": "MINIO_ACCESS_KEY",
+                  "value": "minio"
+                },
+                {
+                  "env_var": "MINIO_SECRET_KEY",
+                  "value": "minio123"
+                },
+                {
+                  "env_var": "INPUT_BUCKET",
+                  "value": "customer-bucket"
+                },
+                {
+                  "env_var": "INPUT_KEY",
+                  "value": "qa-pipeline/mean-fill-branch/outliers_removed_data.pkl"
+                },
+                {
+                  "env_var": "OUTPUT_BUCKET",
+                  "value": "customer-bucket"
+                },
+                {
+                  "env_var": "OUTPUT_PREFIX",
+                  "value": "qa-pipeline/mean-fill-branch"
+                },
+                {
+                  "env_var": "CHAIN_TRANSFORMATIONS",
+                  "value": "false"
+                },
+                {
+                  "env_var": "UPDATE_RAW_DATA",
+                  "value": "false"
+                },
+                {
+                  "env_var": "DUPLICATE_SUBSET"
+                },
+                {
+                  "env_var": "KEEP_FIRST",
+                  "value": "first"
+                }
+              ],
+              "kubernetes_pod_annotations": [],
+              "kubernetes_pod_labels": [],
+              "kubernetes_secrets": [],
+              "kubernetes_shared_mem_size": {},
+              "kubernetes_tolerations": [],
+              "mounted_volumes": [],
+              "filename": "remove_duplicates.py",
+              "runtime_image": "continuumio/anaconda3@sha256:a2816acd3acda208d92e0bf6c11eb41fda9009ea20f24e123dbf84bb4bd4c4b8"
+            },
+            "label": "QA DEDUP - MEAN BRANCH",
+            "ui_data": {
+              "label": "QA DEDUP - MEAN BRANCH",
+              "image": "/static/elyra/python.svg",
+              "x_pos": 850,
+              "y_pos": 50,
+              "description": "Run Python script"
+            }
+          },
+          "inputs": [
+            {
+              "id": "inPort",
+              "app_data": {
+                "ui_data": {
+                  "cardinality": {
+                    "min": 0,
+                    "max": -1
+                  },
+                  "label": "Input Port"
+                }
+              },
+              "links": [
+                {
+                  "id": "zscore-to-dedup",
+                  "node_id_ref": "statistical-validation-zscore",
+                  "port_id_ref": "outPort"
+                }
+              ]
+            }
+          ],
+          "outputs": [
+            {
+              "id": "outPort",
+              "app_data": {
+                "ui_data": {
+                  "cardinality": {
+                    "min": 0,
+                    "max": -1
+                  },
+                  "label": "Output Port"
+                }
+              }
+            }
+          ]
+        },
+        {
+          "id": "quality-assurance-dedup-median-branch",
+          "type": "execution_node",
+          "op": "execute-python-node",
+          "app_data": {
+            "component_parameters": {
+              "dependencies": [],
+              "include_subdirectories": false,
+              "outputs": [],
+              "env_vars": [
+                {
+                  "env_var": "TEST_MODE",
+                  "value": "s3"
+                },
+                {
+                  "env_var": "MINIO_ENDPOINT",
+                  "value": "http://minio.minio-system.svc.cluster.local:9000"
+                },
+                {
+                  "env_var": "MINIO_ACCESS_KEY",
+                  "value": "minio"
+                },
+                {
+                  "env_var": "MINIO_SECRET_KEY",
+                  "value": "minio123"
+                },
+                {
+                  "env_var": "INPUT_BUCKET",
+                  "value": "customer-bucket"
+                },
+                {
+                  "env_var": "INPUT_KEY",
+                  "value": "qa-pipeline/median-fill-branch/outliers_removed_data.pkl"
+                },
+                {
+                  "env_var": "OUTPUT_BUCKET",
+                  "value": "customer-bucket"
+                },
+                {
+                  "env_var": "OUTPUT_PREFIX",
+                  "value": "qa-pipeline/median-fill-branch"
+                },
+                {
+                  "env_var": "CHAIN_TRANSFORMATIONS",
+                  "value": "false"
+                },
+                {
+                  "env_var": "UPDATE_RAW_DATA",
+                  "value": "false"
+                },
+                {
+                  "env_var": "DUPLICATE_SUBSET"
+                },
+                {
+                  "env_var": "KEEP_FIRST",
+                  "value": "last"
+                }
+              ],
+              "kubernetes_pod_annotations": [],
+              "kubernetes_pod_labels": [],
+              "kubernetes_secrets": [],
+              "kubernetes_shared_mem_size": {},
+              "kubernetes_tolerations": [],
+              "mounted_volumes": [],
+              "filename": "remove_duplicates.py",
+              "runtime_image": "continuumio/anaconda3@sha256:a2816acd3acda208d92e0bf6c11eb41fda9009ea20f24e123dbf84bb4bd4c4b8"
+            },
+            "label": "QA DEDUP - MEDIAN BRANCH",
+            "ui_data": {
+              "label": "QA DEDUP - MEDIAN BRANCH",
+              "image": "/static/elyra/python.svg",
+              "x_pos": 850,
+              "y_pos": 150,
+              "description": "Run Python script"
+            }
+          },
+          "inputs": [
+            {
+              "id": "inPort",
+              "app_data": {
+                "ui_data": {
+                  "cardinality": {
+                    "min": 0,
+                    "max": -1
+                  },
+                  "label": "Input Port"
+                }
+              },
+              "links": [
+                {
+                  "id": "mod-zscore-to-dedup",
+                  "node_id_ref": "statistical-validation-modified-zscore",
+                  "port_id_ref": "outPort"
+                }
+              ]
+            }
+          ],
+          "outputs": [
+            {
+              "id": "outPort",
+              "app_data": {
+                "ui_data": {
+                  "cardinality": {
+                    "min": 0,
+                    "max": -1
+                  },
+                  "label": "Output Port"
+                }
+              }
+            }
+          ]
+        },
+        {
+          "id": "comparative-analysis-iqr",
+          "type": "execution_node",
+          "op": "execute-python-node",
+          "app_data": {
+            "component_parameters": {
+              "dependencies": [],
+              "include_subdirectories": false,
+              "outputs": [],
+              "env_vars": [
+                {
+                  "env_var": "TEST_MODE",
+                  "value": "s3"
+                },
+                {
+                  "env_var": "MINIO_ENDPOINT",
+                  "value": "http://minio.minio-system.svc.cluster.local:9000"
+                },
+                {
+                  "env_var": "MINIO_ACCESS_KEY",
+                  "value": "minio"
+                },
+                {
+                  "env_var": "MINIO_SECRET_KEY",
+                  "value": "minio123"
+                },
+                {
+                  "env_var": "INPUT_BUCKET",
+                  "value": "customer-bucket"
+                },
+                {
+                  "env_var": "INPUT_KEY",
+                  "value": "qa-pipeline/tr1_tr2_raw.pkl"
+                },
+                {
+                  "env_var": "OUTPUT_BUCKET",
+                  "value": "customer-bucket"
+                },
+                {
+                  "env_var": "OUTPUT_PREFIX",
+                  "value": "qa-pipeline/comparative-iqr"
+                },
+                {
+                  "env_var": "CHAIN_TRANSFORMATIONS",
+                  "value": "false"
+                },
+                {
+                  "env_var": "UPDATE_RAW_DATA",
+                  "value": "false"
+                },
+                {
+                  "env_var": "OUTLIER_METHOD",
+                  "value": "iqr"
+                },
+                {
+                  "env_var": "OUTLIER_THRESHOLD",
+                  "value": "1.5"
+                },
+                {
+                  "env_var": "OUTLIER_ACTION",
+                  "value": "cap"
+                }
+              ],
+              "kubernetes_pod_annotations": [],
+              "kubernetes_pod_labels": [],
+              "kubernetes_secrets": [],
+              "kubernetes_shared_mem_size": {},
+              "kubernetes_tolerations": [],
+              "mounted_volumes": [],
+              "filename": "remove_outliers.py",
+              "runtime_image": "continuumio/anaconda3@sha256:a2816acd3acda208d92e0bf6c11eb41fda9009ea20f24e123dbf84bb4bd4c4b8"
+            },
+            "label": "COMPARATIVE ANALYSIS - IQR",
+            "ui_data": {
+              "label": "COMPARATIVE ANALYSIS - IQR",
+              "image": "/static/elyra/python.svg",
+              "x_pos": 450,
+              "y_pos": 250,
+              "description": "Run Python script"
+            }
+          },
+          "inputs": [
+            {
+              "id": "inPort",
+              "app_data": {
+                "ui_data": {
+                  "cardinality": {
+                    "min": 0,
+                    "max": -1
+                  },
+                  "label": "Input Port"
+                }
+              },
+              "links": [
+                {
+                  "id": "loader-to-comparative-iqr",
+                  "node_id_ref": "data-loader-tr1-tr2",
+                  "port_id_ref": "outPort"
+                }
+              ]
+            }
+          ],
+          "outputs": [
+            {
+              "id": "outPort",
+              "app_data": {
+                "ui_data": {
+                  "cardinality": {
+                    "min": 0,
+                    "max": -1
+                  },
+                  "label": "Output Port"
+                }
+              }
+            }
+          ]
+        },
+        {
+          "id": "comparative-analysis-isolation",
+          "type": "execution_node",
+          "op": "execute-python-node",
+          "app_data": {
+            "component_parameters": {
+              "dependencies": [],
+              "include_subdirectories": false,
+              "outputs": [],
+              "env_vars": [
+                {
+                  "env_var": "TEST_MODE",
+                  "value": "s3"
+                },
+                {
+                  "env_var": "MINIO_ENDPOINT",
+                  "value": "http://minio.minio-system.svc.cluster.local:9000"
+                },
+                {
+                  "env_var": "MINIO_ACCESS_KEY",
+                  "value": "minio"
+                },
+                {
+                  "env_var": "MINIO_SECRET_KEY",
+                  "value": "minio123"
+                },
+                {
+                  "env_var": "INPUT_BUCKET",
+                  "value": "customer-bucket"
+                },
+                {
+                  "env_var": "INPUT_KEY",
+                  "value": "qa-pipeline/tr1_tr2_raw.pkl"
+                },
+                {
+                  "env_var": "OUTPUT_BUCKET",
+                  "value": "customer-bucket"
+                },
+                {
+                  "env_var": "OUTPUT_PREFIX",
+                  "value": "qa-pipeline/comparative-isolation"
+                },
+                {
+                  "env_var": "CHAIN_TRANSFORMATIONS",
+                  "value": "false"
+                },
+                {
+                  "env_var": "UPDATE_RAW_DATA",
+                  "value": "false"
+                },
+                {
+                  "env_var": "OUTLIER_METHOD",
+                  "value": "isolation_forest"
+                },
+                {
+                  "env_var": "OUTLIER_THRESHOLD",
+                  "value": "0.05"
+                },
+                {
+                  "env_var": "OUTLIER_ACTION",
+                  "value": "remove"
+                }
+              ],
+              "kubernetes_pod_annotations": [],
+              "kubernetes_pod_labels": [],
+              "kubernetes_secrets": [],
+              "kubernetes_shared_mem_size": {},
+              "kubernetes_tolerations": [],
+              "mounted_volumes": [],
+              "filename": "remove_outliers.py",
+              "runtime_image": "continuumio/anaconda3@sha256:a2816acd3acda208d92e0bf6c11eb41fda9009ea20f24e123dbf84bb4bd4c4b8"
+            },
+            "label": "COMPARATIVE ANALYSIS - ISOLATION",
+            "ui_data": {
+              "label": "COMPARATIVE ANALYSIS - ISOLATION",
+              "image": "/static/elyra/python.svg",
+              "x_pos": 450,
+              "y_pos": 320,
+              "description": "Run Python script"
+            }
+          },
+          "inputs": [
+            {
+              "id": "inPort",
+              "app_data": {
+                "ui_data": {
+                  "cardinality": {
+                    "min": 0,
+                    "max": -1
+                  },
+                  "label": "Input Port"
+                }
+              },
+              "links": [
+                {
+                  "id": "loader-to-comparative-isolation",
+                  "node_id_ref": "data-loader-tr1-tr2",
+                  "port_id_ref": "outPort"
+                }
+              ]
+            }
+          ],
+          "outputs": [
+            {
+              "id": "outPort",
+              "app_data": {
+                "ui_data": {
+                  "cardinality": {
+                    "min": 0,
+                    "max": -1
+                  },
+                  "label": "Output Port"
+                }
+              }
+            }
+          ]
+        },
+        {
+          "id": "final-feature-engineering-forward-fill",
+          "type": "execution_node",
+          "op": "execute-python-node",
+          "app_data": {
+            "component_parameters": {
+              "dependencies": [],
+              "include_subdirectories": false,
+              "outputs": [],
+              "env_vars": [
+                {
+                  "env_var": "TEST_MODE",
+                  "value": "s3"
+                },
+                {
+                  "env_var": "MINIO_ENDPOINT",
+                  "value": "http://minio.minio-system.svc.cluster.local:9000"
+                },
+                {
+                  "env_var": "MINIO_ACCESS_KEY",
+                  "value": "minio"
+                },
+                {
+                  "env_var": "MINIO_SECRET_KEY",
+                  "value": "minio123"
+                },
+                {
+                  "env_var": "INPUT_BUCKET",
+                  "value": "customer-bucket"
+                },
+                {
+                  "env_var": "INPUT_KEY",
+                  "value": "qa-pipeline/comparative-iqr/outliers_removed_data.pkl"
+                },
+                {
+                  "env_var": "OUTPUT_BUCKET",
+                  "value": "customer-bucket"
+                },
+                {
+                  "env_var": "OUTPUT_PREFIX",
+                  "value": "qa-pipeline/comparative-iqr"
+                },
+                {
+                  "env_var": "CHAIN_TRANSFORMATIONS",
+                  "value": "false"
+                },
+                {
+                  "env_var": "UPDATE_RAW_DATA",
+                  "value": "false"
+                },
+                {
+                  "env_var": "NULL_STRATEGY",
+                  "value": "fill_forward"
+                },
+                {
+                  "env_var": "NULL_THRESHOLD",
+                  "value": "0.3"
+                }
+              ],
+              "kubernetes_pod_annotations": [],
+              "kubernetes_pod_labels": [],
+              "kubernetes_secrets": [],
+              "kubernetes_shared_mem_size": {},
+              "kubernetes_tolerations": [],
+              "mounted_volumes": [],
+              "filename": "clean_null_values.py",
+              "runtime_image": "continuumio/anaconda3@sha256:a2816acd3acda208d92e0bf6c11eb41fda9009ea20f24e123dbf84bb4bd4c4b8"
+            },
+            "label": "FINAL FEATURE ENG - FORWARD FILL",
+            "ui_data": {
+              "label": "FINAL FEATURE ENG - FORWARD FILL",
+              "image": "/static/elyra/python.svg",
+              "x_pos": 650,
+              "y_pos": 250,
+              "description": "Run Python script"
+            }
+          },
+          "inputs": [
+            {
+              "id": "inPort",
+              "app_data": {
+                "ui_data": {
+                  "cardinality": {
+                    "min": 0,
+                    "max": -1
+                  },
+                  "label": "Input Port"
+                }
+              },
+              "links": [
+                {
+                  "id": "comparative-iqr-to-forward-fill",
+                  "node_id_ref": "comparative-analysis-iqr",
+                  "port_id_ref": "outPort"
+                }
+              ]
+            }
+          ],
+          "outputs": [
+            {
+              "id": "outPort",
+              "app_data": {
+                "ui_data": {
+                  "cardinality": {
+                    "min": 0,
+                    "max": -1
+                  },
+                  "label": "Output Port"
+                }
+              }
+            }
+          ]
+        },
+        {
+          "id": "final-feature-engineering-mode-fill",
+          "type": "execution_node",
+          "op": "execute-python-node",
+          "app_data": {
+            "component_parameters": {
+              "dependencies": [],
+              "include_subdirectories": false,
+              "outputs": [],
+              "env_vars": [
+                {
+                  "env_var": "TEST_MODE",
+                  "value": "s3"
+                },
+                {
+                  "env_var": "MINIO_ENDPOINT",
+                  "value": "http://minio.minio-system.svc.cluster.local:9000"
+                },
+                {
+                  "env_var": "MINIO_ACCESS_KEY",
+                  "value": "minio"
+                },
+                {
+                  "env_var": "MINIO_SECRET_KEY",
+                  "value": "minio123"
+                },
+                {
+                  "env_var": "INPUT_BUCKET",
+                  "value": "customer-bucket"
+                },
+                {
+                  "env_var": "INPUT_KEY",
+                  "value": "qa-pipeline/comparative-isolation/outliers_removed_data.pkl"
+                },
+                {
+                  "env_var": "OUTPUT_BUCKET",
+                  "value": "customer-bucket"
+                },
+                {
+                  "env_var": "OUTPUT_PREFIX",
+                  "value": "qa-pipeline/comparative-isolation"
+                },
+                {
+                  "env_var": "CHAIN_TRANSFORMATIONS",
+                  "value": "false"
+                },
+                {
+                  "env_var": "UPDATE_RAW_DATA",
+                  "value": "false"
+                },
+                {
+                  "env_var": "NULL_STRATEGY",
+                  "value": "fill_mode"
+                },
+                {
+                  "env_var": "NULL_THRESHOLD",
+                  "value": "0.3"
+                }
+              ],
+              "kubernetes_pod_annotations": [],
+              "kubernetes_pod_labels": [],
+              "kubernetes_secrets": [],
+              "kubernetes_shared_mem_size": {},
+              "kubernetes_tolerations": [],
+              "mounted_volumes": [],
+              "filename": "clean_null_values.py",
+              "runtime_image": "continuumio/anaconda3@sha256:a2816acd3acda208d92e0bf6c11eb41fda9009ea20f24e123dbf84bb4bd4c4b8"
+            },
+            "label": "FINAL FEATURE ENG - MODE FILL",
+            "ui_data": {
+              "label": "FINAL FEATURE ENG - MODE FILL",
+              "image": "/static/elyra/python.svg",
+              "x_pos": 650,
+              "y_pos": 320,
+              "description": "Run Python script"
+            }
+          },
+          "inputs": [
+            {
+              "id": "inPort",
+              "app_data": {
+                "ui_data": {
+                  "cardinality": {
+                    "min": 0,
+                    "max": -1
+                  },
+                  "label": "Input Port"
+                }
+              },
+              "links": [
+                {
+                  "id": "comparative-isolation-to-mode-fill",
+                  "node_id_ref": "comparative-analysis-isolation",
+                  "port_id_ref": "outPort"
+                }
+              ]
+            }
+          ],
+          "outputs": [
+            {
+              "id": "outPort",
+              "app_data": {
+                "ui_data": {
+                  "cardinality": {
+                    "min": 0,
+                    "max": -1
+                  },
+                  "label": "Output Port"
+                }
+              }
+            }
+          ]
+        }
+      ],
+      "app_data": {
+        "ui_data": {
+          "comments": [
+            {
+              "id": "pipeline-architecture-overview",
+              "x_pos": 50,
+              "y_pos": 400,
+              "width": 800,
+              "height": 699,
+              "content": "## Quality Assurance & Feature Engineering Pipeline for TR1_TR2.csv\n\n**Stage 1**: Load TR1_TR2.csv → Initial Quality Check (drop columns >70% nulls)\n\n**Stage 2**: Dual Feature Engineering Branches:\n- **Mean Fill Branch**: Mean imputation → Z-score validation → Final QA deduplication\n- **Median Fill Branch**: Median imputation → Modified Z-score validation → Final QA deduplication\n\n**Stage 3**: Comparative Analysis Branches (parallel to Stage 1):\n- **IQR Branch**: IQR outlier capping → Forward fill → Comparative results\n- **Isolation Branch**: Isolation Forest outlier removal → Mode fill → Comparative results\n\n**Output**: 4 different processing strategies for quality comparison and feature selection",
+              "associated_id_refs": []
+            }
+          ]
+        },
+        "version": 8,
+        "runtime_type": "APACHE_AIRFLOW",
+        "properties": {
+          "name": "quality_assunrance_feature_engineering",
+          "runtime": "Apache Airflow",
+          "pipeline_defaults": {
+            "kubernetes_pod_annotations": [],
+            "kubernetes_tolerations": [],
+            "kubernetes_pod_labels": [],
+            "mounted_volumes": [],
+            "kubernetes_shared_mem_size": {},
+            "env_vars": [],
+            "kubernetes_secrets": []
+          }
+        }
+      },
+      "runtime_ref": ""
+    }
+  ],
+  "schemas": []
+}

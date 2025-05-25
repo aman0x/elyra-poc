@@ -65,7 +65,7 @@
               "label": "DATA LOADER",
               "image": "/static/elyra/python.svg",
               "x_pos": 50,
-              "y_pos": 50,
+              "y_pos": 165,
               "description": "Run Python script"
             }
           },
@@ -169,8 +169,8 @@
             "ui_data": {
               "label": "INITIAL DEDUPLICATION",
               "image": "/static/elyra/python.svg",
-              "x_pos": 250,
-              "y_pos": 50,
+              "x_pos": 530,
+              "y_pos": 165,
               "description": "Run Python script"
             }
           },
@@ -188,8 +188,8 @@
               },
               "links": [
                 {
-                  "id": "loader-to-initial-dedup",
-                  "node_id_ref": "data-loader",
+                  "id": "2d7a07bc-fa68-4856-a983-9ff423ccc1da",
+                  "node_id_ref": "3a6d2255-a2bb-42a3-b3c1-7ecbb8a9bade",
                   "port_id_ref": "outPort"
                 }
               ]
@@ -294,8 +294,8 @@
             "ui_data": {
               "label": "OUTLIERS IQR METHOD",
               "image": "/static/elyra/python.svg",
-              "x_pos": 450,
-              "y_pos": 20,
+              "x_pos": 770,
+              "y_pos": 50,
               "description": "Run Python script"
             }
           },
@@ -411,8 +411,8 @@
             "ui_data": {
               "label": "OUTLIERS ISOLATION FOREST",
               "image": "/static/elyra/python.svg",
-              "x_pos": 450,
-              "y_pos": 120,
+              "x_pos": 770,
+              "y_pos": 165,
               "description": "Run Python script"
             }
           },
@@ -528,8 +528,8 @@
             "ui_data": {
               "label": "CONSERVATIVE OUTLIER CAPPING",
               "image": "/static/elyra/python.svg",
-              "x_pos": 450,
-              "y_pos": 220,
+              "x_pos": 770,
+              "y_pos": 280,
               "description": "Run Python script"
             }
           },
@@ -641,8 +641,8 @@
             "ui_data": {
               "label": "IQR BRANCH - MEDIAN FILL",
               "image": "/static/elyra/python.svg",
-              "x_pos": 650,
-              "y_pos": 20,
+              "x_pos": 1010,
+              "y_pos": 50,
               "description": "Run Python script"
             }
           },
@@ -754,8 +754,8 @@
             "ui_data": {
               "label": "ISOLATION BRANCH - DROP COLS",
               "image": "/static/elyra/python.svg",
-              "x_pos": 650,
-              "y_pos": 120,
+              "x_pos": 1010,
+              "y_pos": 165,
               "description": "Run Python script"
             }
           },
@@ -867,8 +867,8 @@
             "ui_data": {
               "label": "CONSERVATIVE - FORWARD FILL",
               "image": "/static/elyra/python.svg",
-              "x_pos": 650,
-              "y_pos": 220,
+              "x_pos": 1010,
+              "y_pos": 280,
               "description": "Run Python script"
             }
           },
@@ -979,8 +979,8 @@
             "ui_data": {
               "label": "IQR FINAL DEDUP",
               "image": "/static/elyra/python.svg",
-              "x_pos": 850,
-              "y_pos": 20,
+              "x_pos": 1250,
+              "y_pos": 50,
               "description": "Run Python script"
             }
           },
@@ -1096,8 +1096,8 @@
             "ui_data": {
               "label": "ISOLATION Z-SCORE REFINEMENT",
               "image": "/static/elyra/python.svg",
-              "x_pos": 850,
-              "y_pos": 120,
+              "x_pos": 1250,
+              "y_pos": 165,
               "description": "Run Python script"
             }
           },
@@ -1209,8 +1209,8 @@
             "ui_data": {
               "label": "CONSERVATIVE FINAL MEDIAN",
               "image": "/static/elyra/python.svg",
-              "x_pos": 850,
-              "y_pos": 220,
+              "x_pos": 1250,
+              "y_pos": 280,
               "description": "Run Python script"
             }
           },
@@ -1249,6 +1249,126 @@
               }
             }
           ]
+        },
+        {
+          "id": "3a6d2255-a2bb-42a3-b3c1-7ecbb8a9bade",
+          "type": "execution_node",
+          "op": "execute-python-node",
+          "app_data": {
+            "component_parameters": {
+              "dependencies": [],
+              "include_subdirectories": false,
+              "outputs": [],
+              "env_vars": [
+                {
+                  "env_var": "UPDATE_RAW_DATA"
+                },
+                {
+                  "env_var": "TEST_MODE",
+                  "value": "s3"
+                },
+                {
+                  "env_var": "INPUT_SOURCE"
+                },
+                {
+                  "env_var": "CHAIN_TRANSFORMATIONS"
+                },
+                {
+                  "env_var": "INPUT_PATH"
+                },
+                {
+                  "env_var": "OUTPUT_PATH"
+                },
+                {
+                  "env_var": "MINIO_ENDPOINT",
+                  "value": "http://minio.minio-system.svc.cluster.local:9000"
+                },
+                {
+                  "env_var": "MINIO_ACCESS_KEY",
+                  "value": "minio"
+                },
+                {
+                  "env_var": "MINIO_SECRET_KEY",
+                  "value": "minio123"
+                },
+                {
+                  "env_var": "INPUT_BUCKET",
+                  "value": "customer-bucket"
+                },
+                {
+                  "env_var": "OUTPUT_PREFIX",
+                  "value": "pipeline-data"
+                },
+                {
+                  "env_var": "OUTPUT_BUCKET",
+                  "value": "customer-bucket"
+                },
+                {
+                  "env_var": "INPUT_KEY"
+                },
+                {
+                  "env_var": "NULL_STRATEGY"
+                },
+                {
+                  "env_var": "NULL_THRESHOLD"
+                },
+                {
+                  "env_var": "NULL_COLUMNS"
+                }
+              ],
+              "kubernetes_pod_annotations": [],
+              "kubernetes_pod_labels": [],
+              "kubernetes_secrets": [],
+              "kubernetes_shared_mem_size": {},
+              "kubernetes_tolerations": [],
+              "mounted_volumes": [],
+              "filename": "clean_null_values.py",
+              "runtime_image": "continuumio/anaconda3@sha256:a2816acd3acda208d92e0bf6c11eb41fda9009ea20f24e123dbf84bb4bd4c4b8"
+            },
+            "label": "CLEAN NULL VALUES",
+            "ui_data": {
+              "label": "CLEAN NULL VALUES",
+              "image": "/static/elyra/python.svg",
+              "x_pos": 290,
+              "y_pos": 165,
+              "description": "Run Python script"
+            }
+          },
+          "inputs": [
+            {
+              "id": "inPort",
+              "app_data": {
+                "ui_data": {
+                  "cardinality": {
+                    "min": 0,
+                    "max": -1
+                  },
+                  "label": "Input Port"
+                }
+              },
+              "links": [
+                {
+                  "id": "f4c64d54-f682-40ac-90bd-0b9cbff7639c",
+                  "node_id_ref": "data-loader",
+                  "port_id_ref": "outPort"
+                }
+              ]
+            }
+          ],
+          "outputs": [
+            {
+              "id": "outPort",
+              "app_data": {
+                "ui_data": {
+                  "cardinality": {
+                    "min": 0,
+                    "max": -1
+                  },
+                  "label": "Output Port"
+                }
+              }
+            }
+          ]
         }
       ],
       "app_data": {
@@ -1259,8 +1379,8 @@
               "x_pos": 50,
               "y_pos": 300,
               "width": 800,
-              "height": 120,
-              "content": "## Complex Multi-Branch Processing Pipeline - FIXED\n\n**Data Flow**: Load → Initial Deduplication (updates raw) → 3 Parallel Branches\n\n**IQR Branch**: raw → IQR outliers → median fill → final dedup  \n**Isolation Branch**: raw → isolation forest → column drop → z-score refinement  \n**Conservative Branch**: raw → outlier capping → forward fill → final median fill\n\n**Fix Applied**: All parallel branches now explicitly read from main pipeline-data/input_data.pkl (updated by initial dedup) and write to separate branch directories for comparison.\n\n**Output Paths**: `/iqr-branch/`, `/isolation-branch/`, `/conservative-branch/`",
+              "height": 423,
+              "content": "## Complex Multi-Branch Processing Pipeline\n\n**Data Flow**: Load → Initial Deduplication (updates raw) → 3 Parallel Branches\n\n**IQR Branch**: raw → IQR outliers → median fill → final dedup  \n**Isolation Branch**: raw → isolation forest → column drop → z-score refinement  \n**Conservative Branch**: raw → outlier capping → forward fill → final median fill\n\n**RUN**: All parallel branches now explicitly read from main pipeline-data/input_data.pkl (updated by initial dedup) and write to separate branch directories for comparison.\n\n**Output Paths**: `/iqr-branch/`, `/isolation-branch/`, `/conservative-branch/`",
               "associated_id_refs": []
             }
           ]
