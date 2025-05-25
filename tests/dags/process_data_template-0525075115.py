@@ -25,7 +25,7 @@ Created with Elyra 3.15.0 pipeline editor using `process_data_template.pipeline`
 
 op_45221178_bbbb_450e_bd56_616656b7a9ee = KubernetesPodOperator(
     name="load_data_from_s3",
-    namespace="default",
+    namespace="airflow-elyra",
     image="continuumio/anaconda3@sha256:a2816acd3acda208d92e0bf6c11eb41fda9009ea20f24e123dbf84bb4bd4c4b8",
     cmds=["sh", "-c"],
     arguments=[
