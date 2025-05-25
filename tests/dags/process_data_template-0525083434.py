@@ -73,7 +73,7 @@ op_15a3d219_1685_42c3_b9d4_352aafaa6cdf = KubernetesPodOperator(
         "MINIO_ENDPOINT": "http://minio.minio-system.svc.cluster.local:9000",
         "MINIO_ACCESS_KEY": "minio",
         "MINIO_SECRET_KEY": "minio123",
-        "INPUT_BUCKET": "customer-bucket",
+        "INPUT_BUCKET": "pipeline-data",
         "INPUT_KEY": "process-data/raw_data.pkl",
         "OUTPUT_PREFIX": "data/deduplicated",
         "OUTPUT_BUCKET": "customer-bucket",
