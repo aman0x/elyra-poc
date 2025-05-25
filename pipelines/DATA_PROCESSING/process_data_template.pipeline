@@ -9,7 +9,7 @@
       "id": "primary",
       "nodes": [
         {
-          "id": "8dbde37c-703c-47e0-a67f-b5979bfb5555",
+          "id": "5a9c7c69-e4d3-4833-8cbe-79c98a9ba60d",
           "type": "execution_node",
           "op": "execute-python-node",
           "app_data": {
@@ -18,6 +18,16 @@
               "include_subdirectories": false,
               "outputs": [],
               "env_vars": [
+                {
+                  "env_var": "TEST_MODE",
+                  "value": "s3"
+                },
+                {
+                  "env_var": "INPUT_PATH"
+                },
+                {
+                  "env_var": "OUTPUT_PATH"
+                },
                 {
                   "env_var": "MINIO_ENDPOINT",
                   "value": "http://minio.minio-system.svc.cluster.local:9000"
@@ -36,101 +46,15 @@
                 },
                 {
                   "env_var": "INPUT_KEY",
-                  "value": "sxmlready_encoded_all.csv"
+                  "value": "pipeline-data/input_data.pkl"
                 },
                 {
                   "env_var": "OUTPUT_PREFIX",
-                  "value": "process-data"
+                  "value": "pipeline-data"
                 },
                 {
                   "env_var": "OUTPUT_BUCKET",
-                  "value": "pipeline-data"
-                }
-              ],
-              "kubernetes_pod_annotations": [],
-              "kubernetes_pod_labels": [],
-              "kubernetes_secrets": [],
-              "kubernetes_shared_mem_size": {},
-              "kubernetes_tolerations": [],
-              "mounted_volumes": [],
-              "filename": "load_data_from_s3.py",
-              "runtime_image": "continuumio/anaconda3@sha256:a2816acd3acda208d92e0bf6c11eb41fda9009ea20f24e123dbf84bb4bd4c4b8"
-            },
-            "label": "LOAD DATA",
-            "ui_data": {
-              "label": "LOAD DATA",
-              "image": "/static/elyra/python.svg",
-              "x_pos": 50,
-              "y_pos": 50,
-              "description": "Run Python script"
-            }
-          },
-          "inputs": [
-            {
-              "id": "inPort",
-              "app_data": {
-                "ui_data": {
-                  "cardinality": {
-                    "min": 0,
-                    "max": -1
-                  },
-                  "label": "Input Port"
-                }
-              }
-            }
-          ],
-          "outputs": [
-            {
-              "id": "outPort",
-              "app_data": {
-                "ui_data": {
-                  "cardinality": {
-                    "min": 0,
-                    "max": -1
-                  },
-                  "label": "Output Port"
-                }
-              }
-            }
-          ]
-        },
-        {
-          "id": "15a3d219-1685-42c3-b9d4-352aafaa6cdf",
-          "type": "execution_node",
-          "op": "execute-python-node",
-          "app_data": {
-            "component_parameters": {
-              "dependencies": [],
-              "include_subdirectories": false,
-              "outputs": [],
-              "env_vars": [
-                {
-                  "env_var": "MINIO_ENDPOINT",
-                  "value": "http://minio.minio-system.svc.cluster.local:9000"
-                },
-                {
-                  "env_var": "MINIO_ACCESS_KEY",
-                  "value": "minio"
-                },
-                {
-                  "env_var": "MINIO_SECRET_KEY",
-                  "value": "minio123"
-                },
-                {
-                  "env_var": "INPUT_BUCKET",
                   "value": "customer-bucket"
-                },
-                {
-                  "env_var": "INPUT_KEY",
-                  "value": "process-data/raw_data.pkl"
-                },
-                {
-                  "env_var": "OUTPUT_PREFIX",
-                  "value": "data/deduplicated"
-                },
-                {
-                  "env_var": "OUTPUT_BUCKET",
-                  "value": "pipeline-data"
                 },
                 {
                   "env_var": "DUPLICATE_SUBSET"
@@ -171,8 +95,330 @@
               },
               "links": [
                 {
-                  "id": "d1c1b3f5-c5dd-4077-8e4e-2eb550d4187e",
-                  "node_id_ref": "8dbde37c-703c-47e0-a67f-b5979bfb5555",
+                  "id": "93163ba1-0aea-41a6-8f2f-7057a5fd3eed",
+                  "node_id_ref": "618674d3-d83b-4775-8972-5c33f604c683",
+                  "port_id_ref": "outPort"
+                }
+              ]
+            }
+          ],
+          "outputs": [
+            {
+              "id": "outPort",
+              "app_data": {
+                "ui_data": {
+                  "cardinality": {
+                    "min": 0,
+                    "max": -1
+                  },
+                  "label": "Output Port"
+                }
+              }
+            }
+          ]
+        },
+        {
+          "id": "618674d3-d83b-4775-8972-5c33f604c683",
+          "type": "execution_node",
+          "op": "execute-python-node",
+          "app_data": {
+            "component_parameters": {
+              "dependencies": [],
+              "include_subdirectories": false,
+              "outputs": [],
+              "env_vars": [
+                {
+                  "env_var": "MINIO_ENDPOINT",
+                  "value": "http://minio.minio-system.svc.cluster.local:9000"
+                },
+                {
+                  "env_var": "MINIO_ACCESS_KEY",
+                  "value": "minio"
+                },
+                {
+                  "env_var": "MINIO_SECRET_KEY",
+                  "value": "minio123"
+                },
+                {
+                  "env_var": "INPUT_BUCKET",
+                  "value": "customer-bucket"
+                },
+                {
+                  "env_var": "INPUT_CSV",
+                  "value": "sxmlready_encoded_all.csv"
+                },
+                {
+                  "env_var": "OUTPUT_BUCKET",
+                  "value": "customer-bucket"
+                },
+                {
+                  "env_var": "OUTPUT_PREFIX",
+                  "value": "pipeline-data"
+                },
+                {
+                  "env_var": "OUTPUT_FILENAME",
+                  "value": "input_data.pkl"
+                }
+              ],
+              "kubernetes_pod_annotations": [],
+              "kubernetes_pod_labels": [],
+              "kubernetes_secrets": [],
+              "kubernetes_shared_mem_size": {},
+              "kubernetes_tolerations": [],
+              "mounted_volumes": [],
+              "filename": "load_data_from_s3.py",
+              "runtime_image": "continuumio/anaconda3@sha256:a2816acd3acda208d92e0bf6c11eb41fda9009ea20f24e123dbf84bb4bd4c4b8"
+            },
+            "label": "LOAD FROM S3",
+            "ui_data": {
+              "label": "LOAD FROM S3",
+              "image": "/static/elyra/python.svg",
+              "x_pos": 50,
+              "y_pos": 165,
+              "description": "Run Python script"
+            }
+          },
+          "inputs": [
+            {
+              "id": "inPort",
+              "app_data": {
+                "ui_data": {
+                  "cardinality": {
+                    "min": 0,
+                    "max": -1
+                  },
+                  "label": "Input Port"
+                }
+              }
+            }
+          ],
+          "outputs": [
+            {
+              "id": "outPort",
+              "app_data": {
+                "ui_data": {
+                  "cardinality": {
+                    "min": 0,
+                    "max": -1
+                  },
+                  "label": "Output Port"
+                }
+              }
+            }
+          ]
+        },
+        {
+          "id": "95d721c9-93f2-429f-a1c7-fdbdf13166ed",
+          "type": "execution_node",
+          "op": "execute-python-node",
+          "app_data": {
+            "component_parameters": {
+              "dependencies": [],
+              "include_subdirectories": false,
+              "outputs": [],
+              "env_vars": [
+                {
+                  "env_var": "TEST_MODE",
+                  "value": "s3"
+                },
+                {
+                  "env_var": "INPUT_PATH"
+                },
+                {
+                  "env_var": "OUTPUT_PATH"
+                },
+                {
+                  "env_var": "MINIO_ENDPOINT",
+                  "value": "http://minio.minio-system.svc.cluster.local:9000"
+                },
+                {
+                  "env_var": "MINIO_ACCESS_KEY",
+                  "value": "minio"
+                },
+                {
+                  "env_var": "MINIO_SECRET_KEY",
+                  "value": "minio123"
+                },
+                {
+                  "env_var": "INPUT_BUCKET",
+                  "value": "customer-bucket"
+                },
+                {
+                  "env_var": "INPUT_KEY",
+                  "value": "pipeline-data/input_data.pkl"
+                },
+                {
+                  "env_var": "OUTPUT_PREFIX",
+                  "value": "pipeline-data"
+                },
+                {
+                  "env_var": "OUTPUT_BUCKET",
+                  "value": "customer-bucket"
+                },
+                {
+                  "env_var": "OUTLIER_METHOD",
+                  "value": "iqr"
+                },
+                {
+                  "env_var": "OUTLIER_THRESHOLD",
+                  "value": "3"
+                },
+                {
+                  "env_var": "OUTLIER_COLUMNS"
+                },
+                {
+                  "env_var": "OUTLIER_ACTION",
+                  "value": "remove"
+                }
+              ],
+              "kubernetes_pod_annotations": [],
+              "kubernetes_pod_labels": [],
+              "kubernetes_secrets": [],
+              "kubernetes_shared_mem_size": {},
+              "kubernetes_tolerations": [],
+              "mounted_volumes": [],
+              "filename": "remove_outliers.py",
+              "runtime_image": "continuumio/anaconda3@sha256:a2816acd3acda208d92e0bf6c11eb41fda9009ea20f24e123dbf84bb4bd4c4b8"
+            },
+            "label": "REMOVE OUTLIERS",
+            "ui_data": {
+              "label": "REMOVE OUTLIERS",
+              "image": "/static/elyra/python.svg",
+              "x_pos": 290,
+              "y_pos": 165,
+              "description": "Run Python script"
+            }
+          },
+          "inputs": [
+            {
+              "id": "inPort",
+              "app_data": {
+                "ui_data": {
+                  "cardinality": {
+                    "min": 0,
+                    "max": -1
+                  },
+                  "label": "Input Port"
+                }
+              },
+              "links": [
+                {
+                  "id": "f00f7f13-27e1-444f-9278-90b879be8928",
+                  "node_id_ref": "618674d3-d83b-4775-8972-5c33f604c683",
+                  "port_id_ref": "outPort"
+                }
+              ]
+            }
+          ],
+          "outputs": [
+            {
+              "id": "outPort",
+              "app_data": {
+                "ui_data": {
+                  "cardinality": {
+                    "min": 0,
+                    "max": -1
+                  },
+                  "label": "Output Port"
+                }
+              }
+            }
+          ]
+        },
+        {
+          "id": "c9db7974-36e4-4506-9713-e30e3202c5ff",
+          "type": "execution_node",
+          "op": "execute-python-node",
+          "app_data": {
+            "component_parameters": {
+              "dependencies": [],
+              "include_subdirectories": false,
+              "outputs": [],
+              "env_vars": [
+                {
+                  "env_var": "TEST_MODE",
+                  "value": "s3"
+                },
+                {
+                  "env_var": "INPUT_PATH"
+                },
+                {
+                  "env_var": "OUTPUT_PATH"
+                },
+                {
+                  "env_var": "MINIO_ENDPOINT",
+                  "value": "http://minio.minio-system.svc.cluster.local:9000"
+                },
+                {
+                  "env_var": "MINIO_ACCESS_KEY",
+                  "value": "minio"
+                },
+                {
+                  "env_var": "MINIO_SECRET_KEY",
+                  "value": "minio123"
+                },
+                {
+                  "env_var": "INPUT_BUCKET",
+                  "value": "customer-bucket"
+                },
+                {
+                  "env_var": "INPUT_KEY",
+                  "value": "pipeline-data/input_data.pkl"
+                },
+                {
+                  "env_var": "OUTPUT_PREFIX",
+                  "value": "pipeline-data"
+                },
+                {
+                  "env_var": "OUTPUT_BUCKET",
+                  "value": "customer-bucket"
+                },
+                {
+                  "env_var": "NULL_STRATEGY",
+                  "value": "fill_median"
+                },
+                {
+                  "env_var": "NULL_THRESHOLD",
+                  "value": "0.5"
+                },
+                {
+                  "env_var": "NULL_COLUMNS"
+                }
+              ],
+              "kubernetes_pod_annotations": [],
+              "kubernetes_pod_labels": [],
+              "kubernetes_secrets": [],
+              "kubernetes_shared_mem_size": {},
+              "kubernetes_tolerations": [],
+              "mounted_volumes": [],
+              "filename": "clean_null_values.py",
+              "runtime_image": "continuumio/anaconda3@sha256:a2816acd3acda208d92e0bf6c11eb41fda9009ea20f24e123dbf84bb4bd4c4b8"
+            },
+            "label": "CLEAN NULL VALUES",
+            "ui_data": {
+              "label": "CLEAN NULL VALUES",
+              "image": "/static/elyra/python.svg",
+              "x_pos": 290,
+              "y_pos": 280,
+              "description": "Run Python script"
+            }
+          },
+          "inputs": [
+            {
+              "id": "inPort",
+              "app_data": {
+                "ui_data": {
+                  "cardinality": {
+                    "min": 0,
+                    "max": -1
+                  },
+                  "label": "Input Port"
+                }
+              },
+              "links": [
+                {
+                  "id": "d763f488-1e34-44cf-96eb-629b86902f8f",
+                  "node_id_ref": "618674d3-d83b-4775-8972-5c33f604c683",
                   "port_id_ref": "outPort"
                 }
               ]
