@@ -8,7 +8,7 @@ DO NOT include this in Airflow DAG - it won't work in containerized environment.
 Parameters (via environment variables):
 - INPUT_FILE: Path to local CSV/Excel/Pickle file (default: 'sxmlready_encoded_all.csv')
 - OUTPUT_PATH: Local directory to save outputs (default: './pipeline_output')
-- TEST_MODE: Set to 'local' to enable local file operations
+- TEST_MODE: Set to 'local' to enable local file operations (default: 'local')
 
 Output:
 - Saves data as pickle file locally

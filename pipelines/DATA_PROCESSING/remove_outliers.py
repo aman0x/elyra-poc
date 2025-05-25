@@ -1,19 +1,32 @@
 #!/usr/bin/env python
 """
-Remove Outliers Transformation Node with Local Testing Support
+Remove Outliers Transformation Node
 ============================================================
 This node removes outlier values from the dataset using various methods.
 
 Parameters (via environment variables):
 - TEST_MODE: Set to 'local' for local file operations, otherwise uses S3
-- For S3 mode: Same as original (MINIO_ENDPOINT, etc.)
 - For Local mode:
   - INPUT_PATH: Local path to input pickle file
   - OUTPUT_PATH: Local directory for outputs
-  - OUTLIER_METHOD: Method to detect outliers - 'iqr', 'zscore', 'isolation_forest', 'modified_zscore' (default: 'iqr')
+- For S3 mode:
+  - MINIO_ENDPOINT: MinIO endpoint URL (default: http://localhost:9000)
+  - MINIO_ACCESS_KEY: Access key (default: minioadmin)
+  - MINIO_SECRET_KEY: Secret key (default: minioadmin)
+  - INPUT_BUCKET: S3 bucket for input (default: pipeline-data)
+  - INPUT_KEY: S3 key for input pickle file (default: pipeline-data/input_data.pkl)
+  - OUTPUT_BUCKET: S3 bucket for output (defaults to INPUT_BUCKET)
+  - OUTPUT_PREFIX: S3 prefix for output files (default: pipeline-data)
+- Common parameters:
+  - OUTLIER_METHOD: Detection method - 'iqr', 'zscore', 'isolation_forest', 'modified_zscore' (default: 'iqr')
   - OUTLIER_THRESHOLD: Threshold for outlier detection (default varies by method)
   - OUTLIER_COLUMNS: Comma-separated column names to check (optional - numeric columns if not specified)
   - OUTLIER_ACTION: Action to take - 'remove', 'cap' (default: 'remove')
+
+Output:
+- Saves outlier-cleaned data as pickle file in S3
+- Saves outlier removal statistics JSON in S3
+- Saves plotly visualization data JSON in S3
 """
 
 import os

@@ -1,19 +1,32 @@
 #!/usr/bin/env python
 """
-Clean Null Values Transformation Node with Local Testing Support - INDEPENDENT VERSION
+Clean Null Values Transformation Node
 ====================================================================================
 This node handles missing values in the dataset using various strategies.
 Works independently from raw data, just like outliers and duplicates removal.
 
 Parameters (via environment variables):
 - TEST_MODE: Set to 'local' for local file operations, otherwise uses S3
-- For S3 mode: Same as original (MINIO_ENDPOINT, etc.)
 - For Local mode:
   - INPUT_PATH: Local path to input pickle file
   - OUTPUT_PATH: Local directory for outputs
+- For S3 mode:
+  - MINIO_ENDPOINT: MinIO endpoint URL (default: http://localhost:9000)
+  - MINIO_ACCESS_KEY: Access key (default: minioadmin)
+  - MINIO_SECRET_KEY: Secret key (default: minioadmin)
+  - INPUT_BUCKET: S3 bucket for input (default: pipeline-data)
+  - INPUT_KEY: S3 key for input pickle file (default: pipeline-data/input_data.pkl)
+  - OUTPUT_BUCKET: S3 bucket for output (defaults to INPUT_BUCKET)
+  - OUTPUT_PREFIX: S3 prefix for output files (default: pipeline-data)
+- Common parameters:
   - NULL_STRATEGY: Strategy to handle nulls - 'drop_rows', 'drop_cols', 'fill_mean', 'fill_median', 'fill_mode', 'fill_zero', 'fill_forward', 'fill_backward' (default: 'fill_median')
   - NULL_THRESHOLD: For drop_cols strategy, threshold for dropping columns (default: 0.5)
-  - NULL_COLUMNS: Comma-separated column names to clean (optional - all if not specified)
+  - NULL_COLUMNS: Comma-separated column names to clean (optional - all columns if not specified)
+
+Output:
+- Saves null-cleaned data as pickle file in S3
+- Saves null cleaning statistics JSON in S3
+- Saves plotly visualization data JSON in S3
 """
 
 import os
