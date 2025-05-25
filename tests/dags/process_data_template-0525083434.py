@@ -39,7 +39,7 @@ op_8dbde37c_703c_47e0_a67f_b5979bfb5555 = KubernetesPodOperator(
         "INPUT_BUCKET": "customer-bucket",
         "INPUT_KEY": "sxmlready_encoded_all.csv",
         "OUTPUT_PREFIX": "process-data",
-        "OUTPUT_BUCKET": "pipeline-data",
+        "OUTPUT_BUCKET": "customer-bucket",
         "ELYRA_RUNTIME_ENV": "airflow",
         "AWS_ACCESS_KEY_ID": "minio",
         "AWS_SECRET_ACCESS_KEY": "minio123",
