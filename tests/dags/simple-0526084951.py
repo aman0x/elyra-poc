@@ -33,14 +33,22 @@ op_c8caee19_145b_49de_acea_8e371f904d13 = KubernetesPodOperator(
     ],
     task_id="LOAD_DATA_FROM_S3",
     env_vars={
+        # Static values (never change)
         "MINIO_ENDPOINT": "http://minio.minio-system.svc.cluster.local:9000",
         "MINIO_ACCESS_KEY": "minio",
-        "MINIO_SECRET_KEY": "minio122",
         "ELYRA_RUNTIME_ENV": "airflow",
         "AWS_ACCESS_KEY_ID": "minio",
-        "AWS_SECRET_ACCESS_KEY": "minio123",
         "ELYRA_ENABLE_PIPELINE_INFO": "True",
         "ELYRA_RUN_NAME": "simple-{{ ts_nodash }}",
+        
+        # 🔥 DYNAMIC VALUES - These will use your parameters!
+        "MINIO_SECRET_KEY": "{{ dag_run.conf.get('minio_secret_key', 'minio123') if dag_run and dag_run.conf else 'minio123' }}",
+        "AWS_SECRET_ACCESS_KEY": "{{ dag_run.conf.get('aws_secret_key', 'minio123') if dag_run and dag_run.conf else 'minio123' }}",
+        
+        # Map your JSON parameters to the DAG's expected environment variables
+        "INPUT_CSV": "{{ dag_run.conf.get('input_key', 'sxmlready_encoded_all.csv') if dag_run and dag_run.conf else 'sxmlready_encoded_all.csv' }}",
+        "OUTPUT_BUCKET": "{{ dag_run.conf.get('output_bucket', 'customer-bucket') if dag_run and dag_run.conf else 'customer-bucket' }}",
+        "OUTPUT_PREFIX": "{{ dag_run.conf.get('output_prefix', 'pipeline-data') if dag_run and dag_run.conf else 'pipeline-data' }}",
     },
     volumes=[],
     volume_mounts=[],

@@ -8,7 +8,7 @@ import {
   TaskInstanceListResponse,
   TriggerDagRequest,
   TriggerDagResponse,
-  LatestRunsResponse
+  DagParameters
 } from '../types/api';
 
 class AirflowService {
@@ -153,7 +153,7 @@ class AirflowService {
   }
 
   /**
-   * Trigger a new DAG run
+   * Trigger a new DAG run (original method - kept for backward compatibility)
    */
   async triggerDag(dagId: string, config?: TriggerDagRequest): Promise<TriggerDagResponse> {
     try {
@@ -163,6 +163,68 @@ class AirflowService {
     } catch (error) {
       throw new Error(handleApiError(error));
     }
+  }
+
+  /**
+   * NEW: Trigger a DAG with parameters
+   * Handles the Airflow 1.10.15 experimental API requirement for JSON string conf
+   */
+  async triggerDagWithParameters(
+    dagId: string, 
+    parameters: DagParameters = {}
+  ): Promise<TriggerDagResponse> {
+    try {
+      const endpoint = ENDPOINTS.TRIGGER_DAG.replace('{dag_id}', dagId);
+      
+      // Convert parameters to the format required by Airflow 1.10.15 experimental API
+      // CRITICAL: conf must be a JSON string, not a JSON object
+      const payload: TriggerDagRequest = {
+        conf: Object.keys(parameters).length > 0 ? JSON.stringify(parameters) : undefined
+      };
+
+      console.log(`Triggering DAG ${dagId} with payload:`, payload);
+      
+      const response = await this.api.post<TriggerDagResponse>(endpoint, payload);
+      return response.data;
+    } catch (error) {
+      throw new Error(handleApiError(error));
+    }
+  }
+
+  /**
+   * NEW: Validate parameters before sending
+   * Basic validation to prevent common issues
+   */
+  validateParameters(parameters: DagParameters): { valid: boolean; errors: string[] } {
+    const errors: string[] = [];
+
+    try {
+      // Check if parameters can be JSON stringified
+      const jsonString = JSON.stringify(parameters);
+      
+      // Check size limit (Airflow 1.10.15 has ~64KB limit for conf)
+      const sizeInBytes = new Blob([jsonString]).size;
+      if (sizeInBytes > 60 * 1024) { // 60KB to be safe
+        errors.push('Parameters too large (limit ~60KB)');
+      }
+
+      // Check for circular references
+      JSON.parse(jsonString);
+      
+    } catch (error) {
+      errors.push('Parameters contain circular references or invalid JSON');
+    }
+
+    // Check for potentially dangerous values
+    const jsonStr = JSON.stringify(parameters);
+    if (jsonStr.includes('<script') || jsonStr.includes('javascript:')) {
+      errors.push('Parameters contain potentially unsafe content');
+    }
+
+    return {
+      valid: errors.length === 0,
+      errors
+    };
   }
 
   /**
