@@ -60,6 +60,9 @@ data:
     min_file_process_interval = 5
     job_heartbeat_sec = 5
     scheduler_heartbeat_sec = 5
+    
+    [api]
+    auth_backend = airflow.api.auth.backend.default
 ---
 # Git-sync ConfigMap with improved script
 apiVersion: v1

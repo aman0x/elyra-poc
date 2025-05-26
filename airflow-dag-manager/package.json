@@ -1,0 +1,38 @@
+{
+  "name": "airflow-dag-manager",
+  "version": "1.0.0",
+  "description": "React TypeScript application for managing Apache Airflow DAGs",
+  "private": true,
+  "dependencies": {
+    "@types/node": "^18.15.0",
+    "@types/react": "^18.0.28",
+    "@types/react-dom": "^18.0.11",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "react-scripts": "5.0.1",
+    "typescript": "^4.9.5",
+    "axios": "^1.3.4",
+    "date-fns": "^2.29.3",
+    "aws-sdk": "^2.1345.0"
+  },
+  "scripts": {
+    "start": "react-scripts start",
+    "build": "react-scripts build",
+    "test": "react-scripts test",
+    "proxy": "node dev-proxy.js",
+    "docker:build": "docker build -t airflow-dag-manager .",
+    "docker:run": "docker run -p 3000:3000 airflow-dag-manager"
+  },
+  "browserslist": {
+    "production": [
+      ">0.2%",
+      "not dead",
+      "not op_mini all"
+    ],
+    "development": [
+      "last 1 chrome version",
+      "last 1 firefox version",
+      "last 1 safari version"
+    ]
+  }
+}
