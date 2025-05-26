@@ -70,6 +70,7 @@ op_b07880ae_79d6_4db0_8887_ce295f96bb1f = KubernetesPodOperator(
     ],
     task_id="CLEAN_VALUES",
     env_vars = {
+        "TEST_MODE": "{{ dag_run.conf.get('test_mode', 's3') if dag_run and dag_run.conf else 's3' }}",
         "MINIO_ENDPOINT": "{{ dag_run.conf.get('minio_endpoint', 'http://minio.minio-system.svc.cluster.local:9000') if dag_run and dag_run.conf else 'http://minio.minio-system.svc.cluster.local:9000' }}",
         "MINIO_ACCESS_KEY": "{{ dag_run.conf.get('minio_access_key', 'minio') if dag_run and dag_run.conf else 'minio' }}",
         "MINIO_SECRET_KEY": "{{ dag_run.conf.get('minio_secret_key', 'minio123') if dag_run and dag_run.conf else 'minio123' }}",
