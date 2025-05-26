@@ -57,6 +57,7 @@ data:
     expose_config = True
     
     [scheduler]
+    min_file_process_interval = 5
     job_heartbeat_sec = 5
     scheduler_heartbeat_sec = 5
 ---
@@ -102,14 +103,14 @@ data:
       echo "Warning: $DAGS_SRC directory not found during initial sync"
     fi
     
-    # Continuous sync every 10 seconds
+    # Continuous sync every 5 seconds
     while true; do
       echo "Syncing repository..."
       if cd "$REPO_DIR" && git pull; then
         echo "Git pull succeeded"
       else
         echo "Git pull failed, skipping this sync cycle"
-        sleep 10
+        sleep 5
         continue
       fi
       # Clean destination directory first (preserve __pycache__)
@@ -121,7 +122,7 @@ data:
       else
         echo "Warning: $DAGS_SRC directory not found"
       fi
-      sleep 10
+      sleep 5
     done
 ---
 # PVC for DAGs
