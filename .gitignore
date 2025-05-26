@@ -79,3 +79,6 @@ docker-compose.override.yml
 logs/
 airflow.cfg
 untracked/
+
+# .SHELL
+*.sh
