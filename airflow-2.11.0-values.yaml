@@ -1,0 +1,157 @@
+nameOverride: "airflow"
+fullnameOverride: "airflow"
+
+airflowVersion: "2.11.0"
+defaultAirflowTag: "2.11.0"
+
+executor: "KubernetesExecutor"
+allowPodLaunching: true
+
+namespace: "airflow-elyra"
+
+postgresql:
+  enabled: true
+  auth:
+    enablePostgresUser: true
+    postgresPassword: postgres
+    username: postgres
+    password: postgres
+    database: airflow
+
+webserver:
+  defaultUser:
+    enabled: true
+    role: Admin
+    username: admin
+    email: admin@example.com
+    firstName: admin
+    lastName: user
+    password: admin
+  
+  resources:
+    limits:
+      cpu: 500m
+      memory: 1Gi
+    requests:
+      cpu: 250m
+      memory: 512Mi
+
+scheduler:
+  resources:
+    limits:
+      cpu: 300m
+      memory: 512Mi
+    requests:
+      cpu: 100m
+      memory: 256Mi
+
+dags:
+  persistence:
+    enabled: true
+    size: 1Gi
+    storageClassName: standard
+  gitSync:
+    enabled: true
+    repo: https://github.com/victorfonseca/elyra-poc.git
+    branch: main
+    rev: HEAD
+    ref: main
+    depth: 1
+    maxFailures: 0
+    subPath: "tests/dags"
+    wait: 5
+    sshKeySecret: ~
+    credentialsSecret: ~
+    env:
+      - name: GIT_SYNC_REV
+        value: HEAD
+      - name: GIT_SYNC_DEPTH
+        value: "1"
+
+config:
+  api:
+    auth_backends: airflow.api.auth.backend.basic_auth
+    enable_experimental_api: true
+    expose_auth_api: true
+  core:
+    dags_folder: /opt/airflow/dags
+    load_examples: false
+    executor: KubernetesExecutor
+    fernet_key: 9UGshNRJ_zq-E2RLpcJRPNFW5zEL5Xv9aCMjQQRKoxI=
+  webserver:
+    expose_config: true
+    web_server_host: 0.0.0.0
+    web_server_port: 8080
+  scheduler:
+    min_file_process_interval: 5
+    job_heartbeat_sec: 5
+    scheduler_heartbeat_sec: 5
+  kubernetes:
+    namespace: airflow-elyra
+    worker_container_repository: apache/airflow
+    worker_container_tag: 2.11.0
+    delete_worker_pods: true
+    worker_pods_creation_batch_size: 16
+    worker_service_account_name: airflow
+    image_pull_policy: IfNotPresent
+    pod_template_file: ~
+    worker_pods_queued_check_interval: 5
+    worker_pods_pending_timeout: 300
+    worker_pods_pending_timeout_batch_size: 100
+    worker_resources_request_cpu: "100m"
+    worker_resources_request_memory: "256Mi"
+    worker_resources_limit_cpu: "300m"
+    worker_resources_limit_memory: "512Mi"
+
+serviceAccount:
+  create: true
+  name: airflow
+  annotations: {}
+
+rbac:
+  create: true
+
+ingress:
+  web:
+    enabled: true
+    path: "/"
+    pathType: "ImplementationSpecific"
+    annotations:
+      kubernetes.io/ingress.class: nginx
+
+workers:
+  resources:
+    limits:
+      cpu: 300m
+      memory: 512Mi
+    requests:
+      cpu: 100m
+      memory: 256Mi
+
+triggerer:
+  enabled: true
+  replicas: 1
+  resources:
+    limits:
+      cpu: 300m
+      memory: 768Mi
+    requests:
+      cpu: 150m
+      memory: 384Mi
+
+logs:
+  persistence:
+    enabled: false
+  emptyDirConfig:
+    sizeLimit: 1Gi
+
+securityContexts:
+  pod:
+    fsGroup: 0
+  containers:
+    runAsUser: 50000
+    runAsGroup: 0
+
+env:
+  - name: AIRFLOW__CORE__LOAD_EXAMPLES
+    value: "false"
