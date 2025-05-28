@@ -12,23 +12,18 @@ hub:
     auth: |
       c.Authenticator.admin_users = {'victor@key-ward.com'}
     airflow_catalog: |
-      # Setup Airflow catalog for all users
       from kubespawner import KubeSpawner
       
       async def setup_airflow_catalog(spawner):
-          # Only run this once the pod is ready
           if not spawner.pod_name:
               return
           
-          # Setup script for Airflow catalog
           setup_script = """
           #!/bin/bash
           set -e
           
-          # Create directories for metadata
           mkdir -p /home/jovyan/.local/share/jupyter/metadata/component-catalogs/
           
-          # Check if the Airflow package catalog already exists
           if ! elyra-metadata list component-catalogs | grep -q 'airflow-1-10-15'; then
             echo "Creating Airflow package catalog..."
             elyra-metadata create component-catalogs \
@@ -44,17 +39,14 @@ hub:
             echo "Airflow package catalog already exists. Skipping creation."
           fi
 
-          # List catalogs to verify
           echo "Verifying catalog was created:"
           elyra-metadata list component-catalogs
           
-          # Fix permissions
           chown -R jovyan:users /home/jovyan/.local/share/jupyter/metadata/
           
           echo "Airflow catalog configuration completed successfully"
           """
           
-          # Add init container to run the setup script
           spawner.init_containers = [{
               "name": "init-catalogs",
               "image": spawner.image,
@@ -100,6 +92,40 @@ singleuser:
             mkdir -p /home/jovyan/work;
             mkdir -p /home/jovyan/.local/share/jupyter/metadata;
             chmod -R 775 /home/jovyan/.local
+  networkPolicy:
+    enabled: true
+    egress:
+      - to:
+        - namespaceSelector:
+            matchLabels:
+              kubernetes.io/metadata.name: airflow-elyra
+        ports:
+        - port: 8080
+          protocol: TCP
+      - to:
+        - namespaceSelector:
+            matchLabels:
+              kubernetes.io/metadata.name: minio-system
+        ports:
+        - port: 9001
+          protocol: TCP
+      - to:
+        - namespaceSelector:
+            matchLabels:
+              kubernetes.io/metadata.name: kube-system
+        ports:
+        - port: 53
+          protocol: UDP
+        - port: 53
+          protocol: TCP
+      - to: []
+        ports:
+        - port: 8081
+          protocol: TCP
+      - to: []
+        ports:
+        - port: 8000
+          protocol: TCP
 
 proxy:
   service:
