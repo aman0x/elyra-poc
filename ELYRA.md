@@ -10,6 +10,9 @@ This guide provides the essential kubectl commands to deploy, verify, and intera
 # Apply the Elyra deployment YAML
 kubectl apply -f elyra-deployment.yaml
 
+# New Elyta Deployment
+helm install jupyterhub jupyterhub/jupyterhub --values jupyterhub-elyra-config.yaml --namespace elyra-system --create-namespace
+
 # Watch the deployment status
 kubectl get pods -n elyra-system -w
 ```
@@ -17,6 +20,9 @@ kubectl get pods -n elyra-system -w
 ### 2. Verify Deployment Status
 
 ```bash
+# New Elyra Deployment
+kubectl port-forward -n elyra-system service/proxy-public 8080:http
+
 # Check if all pods are running
 kubectl get pods -n elyra-system
 

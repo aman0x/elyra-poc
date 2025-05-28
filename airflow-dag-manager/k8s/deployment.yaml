@@ -1,0 +1,90 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: airflow-dag-manager
+  labels:
+    app: airflow-dag-manager
+    version: v1.0.0
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: airflow-dag-manager
+  template:
+    metadata:
+      labels:
+        app: airflow-dag-manager
+    spec:
+      containers:
+      - name: airflow-dag-manager
+        image: airflow-dag-manager:latest
+        imagePullPolicy: Always
+        ports:
+        - containerPort: 80
+          name: http
+        env:
+        - name: REACT_APP_AIRFLOW_BASE_URL
+          valueFrom:
+            configMapKeyRef:
+              name: airflow-dag-manager-config
+              key: AIRFLOW_BASE_URL
+        - name: REACT_APP_AIRFLOW_USERNAME
+          valueFrom:
+            secretKeyRef:
+              name: airflow-dag-manager-secret
+              key: AIRFLOW_USERNAME
+        - name: REACT_APP_AIRFLOW_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: airflow-dag-manager-secret
+              key: AIRFLOW_PASSWORD
+        - name: REACT_APP_MINIO_ENDPOINT
+          valueFrom:
+            configMapKeyRef:
+              name: airflow-dag-manager-config
+              key: MINIO_ENDPOINT
+        - name: REACT_APP_MINIO_ACCESS_KEY
+          valueFrom:
+            secretKeyRef:
+              name: airflow-dag-manager-secret
+              key: MINIO_ACCESS_KEY
+        - name: REACT_APP_MINIO_SECRET_KEY
+          valueFrom:
+            secretKeyRef:
+              name: airflow-dag-manager-secret
+              key: MINIO_SECRET_KEY
+        - name: REACT_APP_MINIO_BUCKET_NAME
+          valueFrom:
+            configMapKeyRef:
+              name: airflow-dag-manager-config
+              key: MINIO_BUCKET_NAME
+        - name: REACT_APP_MINIO_USE_SSL
+          valueFrom:
+            configMapKeyRef:
+              name: airflow-dag-manager-config
+              key: MINIO_USE_SSL
+        resources:
+          requests:
+            memory: "128Mi"
+            cpu: "100m"
+          limits:
+            memory: "256Mi"
+            cpu: "200m"
+        livenessProbe:
+          httpGet:
+            path: /health
+            port: 80
+          initialDelaySeconds: 30
+          periodSeconds: 10
+          timeoutSeconds: 5
+          failureThreshold: 3
+        readinessProbe:
+          httpGet:
+            path: /health
+            port: 80
+          initialDelaySeconds: 5
+          periodSeconds: 5
+          timeoutSeconds: 3
+          successThreshold: 1
+          failureThreshold: 3
+      restartPolicy: Always
