@@ -3,62 +3,11 @@ hub:
     Authenticator:
       class_name: GitHubOAuthenticator
     GitHubOAuthenticator:
-      client_id: Ov23liOwWNzgmCMKAagj
-      client_secret: 63fb33ef4b8f102c95de825d42387b18ef09b1d5
+      client_id: client_id
+      client_secret: client_secret
       oauth_callback_url: http://localhost:8080/hub/oauth_callback
       allowed_users:
-        - victor@key-ward.com
-  extraConfig:
-    auth: |
-      c.Authenticator.admin_users = {'victor@key-ward.com'}
-    airflow_catalog: |
-      from kubespawner import KubeSpawner
-      
-      async def setup_airflow_catalog(spawner):
-          if not spawner.pod_name:
-              return
-          
-          setup_script = """
-          #!/bin/bash
-          set -e
-          
-          mkdir -p /home/jovyan/.local/share/jupyter/metadata/component-catalogs/
-          
-          if ! elyra-metadata list component-catalogs | grep -q 'airflow-1-10-15'; then
-            echo "Creating Airflow package catalog..."
-            elyra-metadata create component-catalogs \
-              --schema_name=airflow-package-catalog \
-              --name="airflow-1-10-15" \
-              --display_name="Apache Airflow 1.10.15 Components" \
-              --description="Apache Airflow 1.10.15 operators and components" \
-              --runtime_type="APACHE_AIRFLOW" \
-              --categories="Core packages" \
-              --airflow_package_download_url="https://files.pythonhosted.org/packages/f0/3a/f5ce74b2bdbbe59c925bb3398ec0781b66a64b8a23e2f6adc7ab9f1005d9/apache_airflow-1.10.15-py2.py3-none-any.whl" \
-              --search_contrib=true
-          else
-            echo "Airflow package catalog already exists. Skipping creation."
-          fi
-
-          echo "Verifying catalog was created:"
-          elyra-metadata list component-catalogs
-          
-          chown -R jovyan:users /home/jovyan/.local/share/jupyter/metadata/
-          
-          echo "Airflow catalog configuration completed successfully"
-          """
-          
-          spawner.init_containers = [{
-              "name": "init-catalogs",
-              "image": spawner.image,
-              "command": ["/bin/bash", "-c", setup_script],
-              "volume_mounts": [
-                  {"name": "home", "mountPath": "/home/jovyan"}
-              ]
-          }]
-          
-          return spawner
-      
-      c.KubeSpawner.post_start_hook = setup_airflow_catalog
+        - GITHUB_USER
 
 singleuser:
   image:
