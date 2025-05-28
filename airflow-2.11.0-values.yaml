@@ -39,11 +39,11 @@ webserver:
 scheduler:
   resources:
     limits:
-      cpu: 300m
-      memory: 512Mi
+      cpu: 500m
+      memory: 2Gi
     requests:
-      cpu: 100m
-      memory: 256Mi
+      cpu: 200m
+      memory: 1Gi
 
 dags:
   persistence:
@@ -55,18 +55,10 @@ dags:
     repo: https://github.com/victorfonseca/elyra-poc.git
     branch: main
     rev: HEAD
-    ref: main
     depth: 1
     maxFailures: 0
     subPath: "tests/dags"
     wait: 5
-    sshKeySecret: ~
-    credentialsSecret: ~
-    env:
-      - name: GIT_SYNC_REV
-        value: HEAD
-      - name: GIT_SYNC_DEPTH
-        value: "1"
 
 config:
   api:
@@ -74,7 +66,7 @@ config:
     enable_experimental_api: true
     expose_auth_api: true
   core:
-    dags_folder: /opt/airflow/dags
+    dags_folder: /opt/airflow/dags/repo
     load_examples: false
     executor: KubernetesExecutor
     fernet_key: 9UGshNRJ_zq-E2RLpcJRPNFW5zEL5Xv9aCMjQQRKoxI=
@@ -94,7 +86,6 @@ config:
     worker_pods_creation_batch_size: 16
     worker_service_account_name: airflow
     image_pull_policy: IfNotPresent
-    pod_template_file: ~
     worker_pods_queued_check_interval: 5
     worker_pods_pending_timeout: 300
     worker_pods_pending_timeout_batch_size: 100
@@ -106,7 +97,6 @@ config:
 serviceAccount:
   create: true
   name: airflow
-  annotations: {}
 
 rbac:
   create: true

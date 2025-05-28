@@ -107,6 +107,8 @@ singleuser:
             matchLabels:
               kubernetes.io/metadata.name: minio-system
         ports:
+        - port: 9000
+          protocol: TCP
         - port: 9001
           protocol: TCP
       - to:
