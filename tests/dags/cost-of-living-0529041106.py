@@ -24,6 +24,7 @@ Created with Elyra 4.0.0.dev0 pipeline editor using `cost-of-living.pipeline`.
 
 op_141e5389_8e68_433a_9a7d_268e674047be = KubernetesPodOperator(
     name="FETCH_DATA",
+    is_delete_operator_pod=False,
     namespace="airflow-elyra",
     image="continuumio/anaconda3:2024.10-1",
     cmds=["sh", "-c"],
@@ -55,6 +56,7 @@ op_141e5389_8e68_433a_9a7d_268e674047be = KubernetesPodOperator(
 
 op_02c35814_e241_465f_a1f4_5bacb6374d9d = KubernetesPodOperator(
     name="VISUALIZATION",
+    is_delete_operator_pod=False,
     namespace="airflow-elyra",
     image="continuumio/anaconda3:2024.10-1",
     cmds=["sh", "-c"],
