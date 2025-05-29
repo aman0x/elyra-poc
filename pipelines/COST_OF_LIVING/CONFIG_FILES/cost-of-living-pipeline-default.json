@@ -1,6 +1,6 @@
 {
   "data_fetcher": {
-    "data_url": "https://raw.githubusercontent.com/victorfonseca/elyra-poc/main/pipelines/COST_OF_LIVING/DATA/cost-of-living_v2.csv",
+    "data_url": "https://raw.githubusercontent.com/victorfonseca/elyra-poc/main/pipelines/COST_OF_LIVING/DATA/cost_of_living_v3.csv",
     "output_dir": "data",
     "csv_filename": "cost_of_living.csv",
     "json_filename": "cost_of_living.json",

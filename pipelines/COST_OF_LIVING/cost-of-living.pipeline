@@ -9,7 +9,7 @@
       "id": "primary",
       "nodes": [
         {
-          "id": "71211e52-fe23-490a-a481-c1128c73e361",
+          "id": "ed3d4d7e-f2bc-44f5-ab4f-34934227c964",
           "type": "execution_node",
           "op": "execute-python-node",
           "app_data": {
@@ -17,7 +17,21 @@
               "dependencies": [],
               "include_subdirectories": false,
               "outputs": [],
-              "env_vars": [],
+              "env_vars": [
+                {
+                  "env_var": "DAG_KEY",
+                  "value": "default"
+                },
+                {
+                  "env_var": "MINIO_ENDPOINT"
+                },
+                {
+                  "env_var": "AWS_ACCESS_KEY_ID"
+                },
+                {
+                  "env_var": "AWS_SECRET_ACCESS_KEY"
+                }
+              ],
               "kubernetes_pod_annotations": [],
               "kubernetes_pod_labels": [],
               "kubernetes_secrets": [],
@@ -25,12 +39,12 @@
               "kubernetes_tolerations": [],
               "mounted_volumes": [],
               "filename": "cost_data_fetcher.py",
-              "runtime_image": "continuumio/anaconda3@sha256:a2816acd3acda208d92e0bf6c11eb41fda9009ea20f24e123dbf84bb4bd4c4b8"
+              "runtime_image": "continuumio/anaconda3:2024.10-1"
             },
-            "label": "",
+            "label": "FETCH DATA",
             "ui_data": {
-              "label": "cost_data_fetcher.py",
-              "image": "/static/elyra/python.svg",
+              "label": "FETCH DATA",
+              "image": "/user/victor@key-ward.com/static/elyra/python.svg",
               "x_pos": 50,
               "y_pos": 50,
               "description": "Run Python script"
@@ -66,7 +80,7 @@
           ]
         },
         {
-          "id": "53136309-0b4b-496d-ab5c-4abf6c8c0264",
+          "id": "327d8e30-50de-46d0-acd2-ce7edc656b8b",
           "type": "execution_node",
           "op": "execute-python-node",
           "app_data": {
@@ -74,7 +88,21 @@
               "dependencies": [],
               "include_subdirectories": false,
               "outputs": [],
-              "env_vars": [],
+              "env_vars": [
+                {
+                  "env_var": "DAG_KEY",
+                  "value": "default"
+                },
+                {
+                  "env_var": "MINIO_ENDPOINT"
+                },
+                {
+                  "env_var": "AWS_ACCESS_KEY_ID"
+                },
+                {
+                  "env_var": "AWS_SECRET_ACCESS_KEY"
+                }
+              ],
               "kubernetes_pod_annotations": [],
               "kubernetes_pod_labels": [],
               "kubernetes_secrets": [],
@@ -82,13 +110,13 @@
               "kubernetes_tolerations": [],
               "mounted_volumes": [],
               "filename": "cost_data_visualizer.py",
-              "runtime_image": "continuumio/anaconda3@sha256:a2816acd3acda208d92e0bf6c11eb41fda9009ea20f24e123dbf84bb4bd4c4b8"
+              "runtime_image": "continuumio/anaconda3:2024.10-1"
             },
-            "label": "",
+            "label": "VISUALIZATION",
             "ui_data": {
-              "label": "cost_data_visualizer.py",
-              "image": "/static/elyra/python.svg",
-              "x_pos": 291,
+              "label": "VISUALIZATION",
+              "image": "/user/victor@key-ward.com/static/elyra/python.svg",
+              "x_pos": 290,
               "y_pos": 50,
               "description": "Run Python script"
             }
@@ -107,8 +135,8 @@
               },
               "links": [
                 {
-                  "id": "673f7eb8-33fe-4075-8daf-746f8f3b72c9",
-                  "node_id_ref": "71211e52-fe23-490a-a481-c1128c73e361",
+                  "id": "90f97f03-79ef-4532-ab87-3976562c0115",
+                  "node_id_ref": "ed3d4d7e-f2bc-44f5-ab4f-34934227c964",
                   "port_id_ref": "outPort"
                 }
               ]
@@ -141,10 +169,11 @@
           "runtime": "Apache Airflow",
           "pipeline_defaults": {
             "kubernetes_shared_mem_size": {},
-            "kubernetes_pod_annotations": [],
-            "kubernetes_pod_labels": [],
             "mounted_volumes": [],
             "kubernetes_tolerations": [],
+            "kubernetes_pod_annotations": [],
+            "kubernetes_pod_labels": [],
+            "kubernetes_secrets": [],
             "env_vars": [
               {
                 "env_var": "MINIO_ENDPOINT",
@@ -158,8 +187,7 @@
                 "env_var": "AWS_SECRET_ACCESS_KEY",
                 "value": "minio123"
               }
-            ],
-            "kubernetes_secrets": []
+            ]
           }
         }
       },
