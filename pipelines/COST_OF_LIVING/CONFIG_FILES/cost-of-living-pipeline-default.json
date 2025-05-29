@@ -1,0 +1,26 @@
+{
+  "data_fetcher": {
+    "data_url": "https://raw.githubusercontent.com/victorfonseca/elyra-poc/main/pipelines/COST_OF_LIVING/DATA/cost-of-living_v2.csv",
+    "output_dir": "data",
+    "csv_filename": "cost_of_living.csv",
+    "json_filename": "cost_of_living.json",
+    "request_timeout": 30,
+    "max_retries": 3,
+    "csv_separator": ",",
+    "csv_encoding": "utf-8"
+  },
+  "visualizer": {
+    "output_dir": "visualizations",
+    "chart_dpi": 300
+  },
+  "minio": {
+    "bucket_name": "customer-bucket",
+    "pipeline_prefix": "cost-of-living"
+  },
+  "metadata": {
+    "created_at": "2025-05-29T10:00:00Z",
+    "description": "Cost of living analysis - fully data-driven visualizations",
+    "version": "2.0",
+    "notes": "Visualizer automatically analyzes all data and creates comprehensive charts"
+  }
+}
